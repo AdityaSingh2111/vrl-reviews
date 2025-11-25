@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+:root {
+  /* We define the custom VRL colors here for v4 */
+  --color-vrl-yellow: #FFCC01;
+  --color-vrl-red: #DC2626;
+}
+
+body {
+  background-color: #f9fafb;
+}
