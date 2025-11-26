@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link'; // Added Link for navigation
 import { db, auth } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
