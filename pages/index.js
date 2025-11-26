@@ -1,13 +1,13 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
-import { db, auth } from '../lib/firebase';
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-import { signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+import { db, auth, googleProvider } from '../lib/firebase';
+import { collection, query, orderBy, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { signInAnonymously, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
 import ReviewForm from '../components/ReviewForm';
 import StarRating from '../components/StarRating';
 import { 
   MessageSquare, CheckCircle, ChevronDown, Menu, X, 
-  MapPin, Phone, Mail, AlertTriangle, XCircle, ArrowUp 
+  MapPin, Phone, Mail, AlertTriangle, XCircle, ArrowUp, Quote, Reply, LogIn, LogOut, User
 } from 'lucide-react';
 
 // --- COMPONENT: 3D TILT CARD ---
@@ -83,7 +83,7 @@ const ScrollToTop = () => {
 const WarningModal = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen) {
-      const timer = setTimeout(onClose, 12000);
+      const timer = setTimeout(onClose, 10000);
       return () => clearTimeout(timer);
     }
   }, [isOpen, onClose]);
@@ -110,7 +110,7 @@ const WarningModal = ({ isOpen, onClose }) => {
               It has come to our notice that few shady logistics companies are operating with names similar to <span className="font-bold">VRL Logistics Packers and Movers</span>.
             </p>
             <div className="bg-gray-100 p-3 rounded-lg border border-gray-200 text-sm md:text-base italic text-gray-600">
-                Example: "VRL Packers and Movers", "VRL Shipping", etc.
+                Example: "VRL Packers and Movers", "VRL Shipping", "VRL Logistics Movers and Packers" etc.
             </div>
             <p className="text-sm md:text-base">
               Please note that <strong>VRL Logistics Packers and Movers</strong> is <span className="text-red-600 font-bold underline">NOT connected</span> to these entities.
@@ -121,13 +121,59 @@ const WarningModal = ({ isOpen, onClose }) => {
                 Advance Payment Alert!
               </h3>
               <p className="text-xs md:text-sm text-gray-700">
-                Our authorized executives will <strong>NEVER</strong> request advance payments via personal accounts.
+                Our authorized executives will <strong>NEVER</strong> request advance payments via personal/saving accounts.
               </p>
             </div>
           </div>
         </div>
         <div className="bg-[#FFCC01] p-2 md:p-3 text-center sticky bottom-0 z-10">
           <p className="text-[#DC2626] font-bold text-xs md:text-sm">This message will disappear shortly...</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const LoginModal = ({ isOpen, onClose, onGoogleLogin, onGuestLogin }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-[110] flex items-center justify-center px-4">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity" />
+      
+      {/* Modal Content */}
+      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in duration-300">
+        <div className="bg-[#FFCC01] p-6 text-center">
+          <h2 className="text-2xl font-bold text-gray-900">Welcome to VRL Reviews</h2>
+          <p className="text-gray-800 text-sm mt-1 font-medium">Please login to continue</p>
+        </div>
+        
+        <div className="p-8 space-y-4">
+           {/* Google Login Button */}
+           <button 
+             onClick={onGoogleLogin}
+             className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 p-3 rounded-xl hover:bg-gray-50 hover:border-[#4285F4] transition-all group"
+           >
+             <div className="w-6 h-6">
+                {/* Simple Google G Icon SVG */}
+                <svg viewBox="0 0 24 24" className="w-full h-full"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+             </div>
+             <span className="font-bold text-gray-700 group-hover:text-[#4285F4]">Login with Google</span>
+           </button>
+
+           <div className="relative flex py-2 items-center">
+             <div className="flex-grow border-t border-gray-200"></div>
+             <span className="flex-shrink-0 mx-4 text-gray-400 text-xs font-bold uppercase">Or</span>
+             <div className="flex-grow border-t border-gray-200"></div>
+           </div>
+
+           {/* Guest Login Button */}
+           <button 
+             onClick={onGuestLogin}
+             className="w-full py-3 bg-gray-100 text-gray-500 rounded-xl font-bold hover:bg-gray-200 hover:text-gray-700 transition-colors text-sm"
+           >
+             Continue as Guest
+           </button>
         </div>
       </div>
     </div>
@@ -143,13 +189,59 @@ export default function Home() {
   const [error, setError] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
   const [sortBy, setSortBy] = useState('Newest');
+  const [showVerifiedOnly, setShowVerifiedOnly] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  const [currentVerifiedIndex, setCurrentVerifiedIndex] = useState(0);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   // --- AUTH ---
   useEffect(() => {
-    signInAnonymously(auth).catch((err) => console.error("Auth Error:", err));
-    return onAuthStateChanged(auth, (u) => setUser(u));
+    if(!auth) return;
+    
+    // Listen for auth state changes
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      if (u) {
+        // User is logged in
+        setUser(u);
+        setShowLoginModal(false);
+        // Only show warning if logged in
+        setIsWarningOpen(true);
+      } else {
+        // User is logged out -> Show Login Modal
+        setUser(null);
+        setShowLoginModal(true);
+        setIsWarningOpen(false);
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
+
+  // --- CHANGED: Login Handlers ---
+  const handleGoogleLogin = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+      // Modal closes automatically via useEffect when auth state changes
+    } catch (err) {
+      console.error("Google Login Error:", err);
+      alert("Failed to login with Google. Please try again.");
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    try {
+      await signInAnonymously(auth);
+      // Modal closes automatically
+    } catch (err) {
+      console.error("Guest Login Error:", err);
+    }
+  };
+
+  const handleLogout = async () => {
+    if (confirm("Are you sure you want to logout?")) {
+       await signOut(auth);
+       // Login modal will open automatically
+    }
+  };
 
   // Data Fetching
   useEffect(() => {
@@ -182,29 +274,33 @@ export default function Home() {
     }
   }, []);
 
-  // // --- NEW: Function to handle Home navigation without reload ---
-  // const handleHomeClick = (e) => { // <--- NEW FUNCTION
-  //   e.preventDefault(); // Stop page reload
-  //   window.scrollTo({ top: 0, behavior: 'smooth' }); // Just scroll up
-  // };
-
-  // --- ADVANCED LOGIC ---
+ //Logic for Verified Review Carousel (Every 5 Seconds)
+  const verifiedReviews = useMemo(() => reviews.filter(r => r.verified), [reviews]);
+  
+  useEffect(() => {
+    if (verifiedReviews.length === 0) return;
+    const interval = setInterval(() => {
+      setCurrentVerifiedIndex((prev) => (prev + 1) % verifiedReviews.length);
+    }, 5000); // 5000ms = 5 seconds
+    return () => clearInterval(interval);
+  }, [verifiedReviews.length]);
   
   // Filter & Sort
   const processedReviews = useMemo(() => {
     let result = [...reviews];
     if (filterCategory !== 'All') result = result.filter(r => r.serviceType === filterCategory);
-    
+    if (showVerifiedOnly) result = result.filter(r => r.verified);
     if (sortBy === 'Lowest') result.sort((a, b) => a.rating - b.rating);
     else if (sortBy === 'Highest') result.sort((a, b) => b.rating - a.rating);
     else result.sort((a, b) => b.createdAt - a.createdAt);
     
     return result;
-  }, [reviews, filterCategory, sortBy]);
+  }, [reviews, filterCategory, sortBy, showVerifiedOnly]);
 
   // Stats
   const stats = useMemo(() => {
     const total = reviews.length;
+    const verifiedTotal = reviews.filter(r => r.verified).length;
     const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
     const avg = total ? (sum / total).toFixed(1) : 0;
     const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
@@ -214,6 +310,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800 font-sans">
+      <LoginModal 
+        isOpen={showLoginModal} 
+        onGoogleLogin={handleGoogleLogin} 
+        onGuestLogin={handleGuestLogin} 
+      />
       <WarningModal isOpen={isWarningOpen} onClose={() => setIsWarningOpen(false)} />
       <ScrollToTop />
       
@@ -236,9 +337,35 @@ export default function Home() {
               >
                 Write a Review
               </button>
+            
+
+            {user ? (
+                <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
+                    <div className="flex items-center gap-2">
+                        {user.photoURL ? (
+                           <img src={user.photoURL} alt="User" className="w-9 h-9 rounded-full border border-gray-200" />
+                        ) : (
+                           <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                              <User size={18} />
+                           </div>
+                        )}
+                        <div className="flex flex-col">
+                            <span className="text-xs font-bold text-gray-900 leading-none">{user.displayName || 'Guest'}</span>
+                            <button onClick={handleLogout} className="text-[10px] text-red-500 hover:underline text-left mt-0.5 font-medium">Logout</button>
+                        </div>
+                    </div>
+                </div>
+              ) : (
+                <button 
+                  onClick={() => setShowLoginModal(true)} 
+                  className="flex items-center gap-2 text-gray-600 hover:text-[#DC2626] font-medium transition"
+                >
+                   <LogIn size={20} /> Login
+                </button>
+              )}
+              {/* -------------------------------------- */}
             </div>
 
-            {/* Mobile Menu Button */}
             <div className="flex items-center md:hidden">
               <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-600 p-2">
                 {isMobileMenuOpen ? <X size={28}/> : <Menu size={28}/>}
@@ -247,11 +374,22 @@ export default function Home() {
           </div>
         </div>
         
-        {/* Mobile Menu Dropdown */}
         {isMobileMenuOpen && (
            <div className="md:hidden absolute top-20 left-0 w-full bg-white/95 backdrop-blur-md border-b border-[#FFCC01] p-4 space-y-4 shadow-xl z-40">
              <a href="#contact-section" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 hover:bg-[#FFF8E1] rounded-lg">Contact</a>
              <a href="https://vrllogistics.co.in/services" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 hover:bg-[#FFF8E1] rounded-lg">Services</a>
+             
+             {/* --- CHANGED: Mobile Menu Login --- */}
+             {user ? (
+               <button onClick={handleLogout} className="w-full flex items-center gap-2 px-4 py-2 text-red-600 font-bold bg-red-50 rounded-lg">
+                 <LogOut size={18} /> Logout ({user.displayName || 'Guest'})
+               </button>
+             ) : (
+               <button onClick={() => {setShowLoginModal(true); setIsMobileMenuOpen(false);}} className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-bold">
+                 <LogIn size={18} /> Login
+               </button>
+             )}
+             
              <button onClick={() => { setIsModalOpen(true); setIsMobileMenuOpen(false); }} className="w-full bg-[#DC2626] text-white py-3 rounded-lg font-bold">Write a Review</button>
            </div>
         )}
@@ -267,55 +405,174 @@ export default function Home() {
             <div className="inline-block bg-white/10 backdrop-blur-md border border-[#FFCC01]/30 rounded-full px-4 py-1 mb-6">
                <span className="text-[#FFCC01] font-bold text-sm">★ India's No.1 Logistics Partner</span>
             </div>
+            <div className="inline-flex items-center gap-2 bg-[#DC2626]/20 border border-[#DC2626] rounded-full px-4 py-1.5 mb-6 backdrop-blur-sm">
+               <CheckCircle size={16} className="text-[#FFCC01]" />
+               <span className="text-white font-bold text-xs md:text-sm uppercase tracking-wider">Genuine & Most Trusted Review Portal</span>
+            </div>
             <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
               Trust delivered <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFCC01] to-yellow-200">Across India</span>
             </h2>
+            <p className="text-gray-400 text-lg md:text-xl mb-8 max-w-lg leading-relaxed mx-auto md:mx-0">
+               Join <span className="text-white font-bold">{stats.total}+</span> happy customers who have shared their genuine relocation experiences with us.
+            </p>
             <div className="flex gap-4 justify-center md:justify-start">
               <button onClick={() => setIsModalOpen(true)} className="bg-[#FFCC01] text-black px-8 py-3.5 rounded-lg font-bold hover:bg-yellow-400 transition shadow-lg active:scale-95">Share Feedback</button>
             </div>
           </div>
 
-          <div className="md:w-1/3 w-full relative z-10">
+          <div className="md:w-1/3 w-full relative z-10 flex flex-col gap-6">
+
+             {/* --- NEW: Stats Card --- */}
              <div className="bg-white/5 backdrop-blur-lg border border-[#FFCC01]/20 p-8 rounded-2xl shadow-2xl relative">
                 <div className="flex items-end gap-3 mb-2">
                    <span className="text-6xl font-bold text-white">{stats.avg}</span>
                    <span className="text-xl text-gray-400 mb-2">/ 5</span>
                 </div>
-                <div className="mb-6"><StarRating rating={Math.round(stats.avg)} size={6} /></div>
+                <div className="mb-4"><StarRating rating={Math.round(stats.avg)} size={6} /></div>
+
+                {/* --- CHANGED: Compact Stats Row (Smart Space Management) --- */}
+                <div className="flex items-center justify-between mb-6 border-y border-white/10 py-3">
+                   {/* Total Reviews Section */}
+                   <div className="flex items-center gap-2">
+                      <span className="text-2xl font-bold text-white leading-none">{stats.total}</span>
+                      <span className="text-xs text-gray-400 uppercase tracking-wide font-medium">Total</span>
+                   </div>
+                   
+                   {/* Vertical Divider */}
+                   <div className="h-8 w-px bg-white/10"></div>
+
+                   {/* Verified Reviews Section (Highlighted) */}
+                   <div className="flex items-center gap-2">
+                      <span className="text-2xl font-bold text-[#FFCC01] leading-none">{stats.verifiedTotal}</span>
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-bold text-[#FFCC01] uppercase tracking-wide leading-tight">Verified</span>
+                        <span className="text-[10px] text-gray-400 uppercase tracking-wide leading-tight">Reviews</span>
+                      </div>
+                   </div>
+                </div>
+                {/* --------------------------------------------------------- */}
+
                 <div className="space-y-2">
                   {[5, 4, 3, 2, 1].map((star) => (
                     <div key={star} className="flex items-center gap-3 text-xs">
                       <span className="w-3 text-gray-400">{star}</span>
                       <div className="flex-1 h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full ${star >= 4 ? 'bg-[#FFCC01]' : 'bg-gray-500'}`} style={{ width: `${stats.total ? (stats.distribution[star] / stats.total) * 100 : 0}%` }}></div>
+                        <div 
+                          className={`h-full rounded-full ${star >= 4 ? 'bg-[#FFCC01]' : 'bg-gray-500'}`} 
+                          style={{ width: `${stats.total ? (stats.distribution[star] / stats.total) * 100 : 0}%` }}
+                        ></div>
                       </div>
                     </div>
                   ))}
                 </div>
              </div>
+
+             {/* --- EXISTING: Live Verified Review Carousel --- */}
+             <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-2xl relative min-h-[280px] flex flex-col justify-between">
+                
+                {/* Header of Card */}
+                <div className="flex justify-between items-center border-b border-white/10 pb-4 mb-4">
+                    <div>
+                        <div className="flex items-baseline gap-2">
+                             <span className="text-4xl font-bold text-white">{stats.verifiedTotal}</span>
+                             <span className="text-sm text-[#FFCC01] font-bold uppercase">Verified Reviews</span>
+                        </div>
+                        <p className="text-xs text-gray-400">Live updates from real customers</p>
+                    </div>
+                    <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center text-green-400 animate-pulse">
+                        <CheckCircle size={24} />
+                    </div>
+                </div>
+
+                {/* Animated Review Content (Page Turn Animation) */}
+                {verifiedReviews.length > 0 ? (
+                  <div 
+                    key={currentVerifiedIndex} 
+                    className="animate-page-turn"
+                  >
+                      <div className="flex items-center gap-3 mb-2">
+                         <div className="w-10 h-10 rounded-full bg-[#FFCC01] text-black flex items-center justify-center font-bold shadow-lg">
+                             {verifiedReviews[currentVerifiedIndex].name.charAt(0)}
+                         </div>
+                         <div>
+                             <p className="font-bold text-white text-sm tracking-wide">{verifiedReviews[currentVerifiedIndex].name}</p>
+                             <div className="flex text-[#FFCC01]"><StarRating rating={verifiedReviews[currentVerifiedIndex].rating} size={3}/></div>
+                         </div>
+                      </div>
+                      
+                      {/* Location Display */}
+                      {(verifiedReviews[currentVerifiedIndex].fromLocation || verifiedReviews[currentVerifiedIndex].toLocation) && (
+                        <div className="flex items-center gap-2 my-3 text-xs font-medium text-gray-300 bg-white/5 p-2 rounded-lg border border-white/10">
+                            <MapPin size={14} className="text-[#FFCC01]" />
+                            <span className="truncate max-w-[100px]">{verifiedReviews[currentVerifiedIndex].fromLocation || 'Origin'}</span>
+                            <span className="text-gray-500">➝</span>
+                            <span className="truncate max-w-[100px]">{verifiedReviews[currentVerifiedIndex].toLocation || 'Dest.'}</span>
+                        </div>
+                      )}
+
+                      {/* --- CHANGED: Quote Alignment Fix --- */}
+                      <div className="relative mt-3">
+                          {/* Positioned absolutely to the left */}
+                          <Quote 
+                            size={24} 
+                            className="absolute top-0 left-0 text-[#FFCC01] opacity-60 transform scale-x-[-1]" 
+                          />
+                          
+                          {/* Text added with left padding (pl-8) to make room for the icon */}
+                          <p className="text-gray-200 text-sm italic font-light leading-relaxed pl-8 relative z-10">
+                              {verifiedReviews[currentVerifiedIndex].comment.substring(0, 120)}...
+                          </p>
+                      </div>
+                      {/* ----------------------------------- */}
+
+                      <div className="mt-4 flex justify-between items-center border-t border-white/10 pt-3">
+                          <span className="text-xs text-gray-400 font-mono tracking-wider">PNR: {verifiedReviews[currentVerifiedIndex].pnr}</span>
+                          <span className="bg-[#FFCC01]/20 text-[#FFCC01] px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-[#FFCC01]/30">
+                            Verified Customer
+                          </span>
+                      </div>
+                  </div>
+                ) : (
+                    <div className="text-gray-400 text-center py-10 animate-pulse">Waiting for verified reviews...</div>
+                )}
+             </div>
+
           </div>
         </div>
       </div>
 
       {/* Main Content */}
+      {/* Filters */}
       <main className="max-w-7xl mx-auto px-4 py-12 -mt-10 relative z-20">
         {error && <div className="bg-red-50 border-l-4 border-[#DC2626] p-4 mb-8 rounded-r-lg"><p className="text-[#DC2626] font-medium">{error}</p></div>}
 
-        <div className="bg-white p-4 rounded-xl shadow-lg border-t-4 border-[#FFCC01] mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
-           <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 no-scrollbar">
+        <div className="bg-white p-4 rounded-xl shadow-lg border-t-4 border-[#FFCC01] mb-8 flex flex-col lg:flex-row justify-between items-center gap-4">
+           {/* Categories */}
+           <div className="flex items-center gap-2 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 no-scrollbar">
               {['All', 'Household', 'Car Transport', 'Bike Transport', 'Warehousing'].map((cat) => (
                 <button key={cat} onClick={() => setFilterCategory(cat)} className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${filterCategory === cat ? 'bg-[#DC2626] text-white' : 'bg-gray-100 text-gray-600 hover:bg-[#FFF8E1]'}`}>{cat}</button>
               ))}
            </div>
-           <div className="flex items-center gap-3">
-             <span className="text-sm text-gray-500 font-medium">Sort by:</span>
-             <div className="relative">
-               <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFCC01]">
-                 <option value="Newest">Newest First</option>
-                 <option value="Highest">Highest Rated</option>
-                 <option value="Lowest">Lowest Rated</option>
-               </select>
-               <ChevronDown size={16} className="absolute right-3 top-3 text-gray-500 pointer-events-none" />
+           <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto justify-end">
+             {/* --- CHANGED: Verified Only Toggle Button --- */}
+             <button 
+                onClick={() => setShowVerifiedOnly(!showVerifiedOnly)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold border transition-all ${showVerifiedOnly ? 'bg-green-50 border-green-500 text-green-700' : 'bg-white border-gray-200 text-gray-500 hover:border-gray-400'}`}
+             >
+                <CheckCircle size={16} className={showVerifiedOnly ? 'fill-green-500 text-white' : ''}/>
+                Verified Only
+             </button>
+
+             <div className="flex items-center gap-2">
+               <span className="text-sm text-gray-500 font-medium hidden sm:block">Sort by:</span>
+               <div className="relative">
+                 <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFCC01]">
+                   <option value="Newest">Newest First</option>
+                   <option value="Highest">Highest Rated</option>
+                   <option value="Lowest">Lowest Rated</option>
+                 </select>
+                 <ChevronDown size={16} className="absolute right-3 top-3 text-gray-500 pointer-events-none" />
+               </div>
              </div>
            </div>
         </div>
@@ -330,25 +587,61 @@ export default function Home() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {processedReviews.map((review) => (
-              <TiltCard key={review.id} className="group bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl relative overflow-hidden">
+              <TiltCard key={review.id} className="group bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl relative overflow-hidden flex flex-col h-full transition-all duration-300">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#FFCC01] to-[#DC2626] opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="flex justify-between items-start mb-4">
+                
+                {/* Header */}
+                <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 text-lg border-2 border-white shadow-sm group-hover:border-[#FFCC01]">{review.name ? review.name.charAt(0).toUpperCase() : 'U'}</div>
+                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 text-lg border-2 border-white shadow-sm group-hover:border-[#FFCC01] transition-colors">
+                      {review.name ? review.name.charAt(0).toUpperCase() : 'U'}
+                    </div>
                     <div>
                       <h4 className="font-bold text-gray-900 group-hover:text-[#DC2626] transition-colors">{review.name}</h4>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] font-bold uppercase text-gray-500 border border-gray-200 px-1.5 rounded bg-gray-50">{review.serviceType}</span>
-                        {review.verified && <span className="text-green-700 flex items-center gap-0.5 text-[10px] font-bold bg-green-50 px-1.5 rounded border border-green-100"><CheckCircle size={10} /> Verified</span>}
+                        <span className="text-[10px] font-bold uppercase text-gray-500 border border-gray-200 px-1.5 py-0.5 rounded bg-white">{review.serviceType}</span>
+                        {review.verified && (
+                          <span className="text-green-700 flex items-center gap-0.5 text-[10px] font-bold bg-green-50 px-1.5 py-0.5 rounded border border-green-100">
+                            <CheckCircle size={10} /> Verified
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
+                  <button onClick={() => handleAdminReply(review.id)} className="text-gray-300 hover:text-blue-600 p-1 rounded transition-colors" title="Admin Reply">
+                      <Reply size={16} />
+                  </button>
                 </div>
-                <div className="mb-4"><StarRating rating={review.rating} size={4} /></div>
-                <p className="text-gray-600 text-sm leading-relaxed mb-6 min-h-[60px]">"{review.comment}"</p>
+
+                {/* --- CHANGED: Display From -> To Location --- */}
+                {(review.fromLocation || review.toLocation) && (
+                  <div className="flex items-center gap-2 mb-3 text-xs font-medium text-gray-500 bg-gray-50 p-2 rounded-lg border border-gray-100">
+                      <MapPin size={14} className="text-[#DC2626]" />
+                      <span className="truncate max-w-[80px]">{review.fromLocation || 'Origin'}</span>
+                      <span className="text-gray-300">➝</span>
+                      <span className="truncate max-w-[80px]">{review.toLocation || 'Dest.'}</span>
+                  </div>
+                )}
+                {/* ------------------------------------------- */}
+
+                <div className="mb-3"><StarRating rating={review.rating} size={4} /></div>
+                
+                <p className="text-gray-600 text-sm leading-relaxed mb-4 flex-grow">"{review.comment}"</p>
+                
+                {/* Admin Reply Section */}
+                {review.adminReply && (
+                    <div className="mt-auto mb-4 bg-amber-50 border-l-4 border-[#FFCC01] p-3 rounded-r text-sm animate-in fade-in slide-in-from-left-2">
+                        <p className="font-bold text-gray-900 text-xs mb-1.5 flex items-center gap-1.5">
+                            <img src="/vrl-logo.png" className="w-4 h-4 object-contain" alt="Admin" /> 
+                            <span>Official Response</span>
+                        </p>
+                        <p className="text-gray-700 text-xs leading-relaxed italic">"{review.adminReply}"</p>
+                    </div>
+                )}
+
                 <div className="pt-4 border-t border-gray-50 flex justify-between items-center text-xs text-gray-400 font-medium">
-                  <span>PNR: {review.pnr}</span>
-                  <span>{review.createdAt ? review.createdAt.toLocaleDateString() : 'Recent'}</span>
+                  <span className="font-mono">PNR: {review.pnr}</span>
+                  <span>{review.createdAt ? review.createdAt.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent'}</span>
                 </div>
               </TiltCard>
             ))}

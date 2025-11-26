@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { X } from 'lucide-react';
+import { X, MapPin } from 'lucide-react'; // Added MapPin icon
 import StarRating from './StarRating';
 
 export default function ReviewForm({ isOpen, onClose, userId }) {
   const [formData, setFormData] = useState({
     name: '',
     pnr: '',
+    // --- CHANGED: Added new location fields to state ---
+    fromLocation: '',
+    toLocation: '',
     serviceType: 'Household',
     rating: 0,
     comment: '',
@@ -16,7 +19,6 @@ export default function ReviewForm({ isOpen, onClose, userId }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  // 1. Return null immediately if closed (Standard React Pattern)
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
@@ -40,14 +42,12 @@ export default function ReviewForm({ isOpen, onClose, userId }) {
         verified: Math.random() > 0.3 
       });
       
-      // Reset and Close
-      setFormData({ name: '', pnr: '', serviceType: 'Household', rating: 0, comment: '' });
+      // --- CHANGED: Reset new fields ---
+      setFormData({ name: '', pnr: '', fromLocation: '', toLocation: '', serviceType: 'Household', rating: 0, comment: '' });
       onClose();
-      // Optional: Alert success
       alert('Review submitted successfully!');
     } catch (err) {
       console.error("Error submitting review:", err);
-      // More descriptive error for the user
       setError('Failed to submit. Please check your internet connection.');
     } finally {
       setIsSubmitting(false);
@@ -55,24 +55,19 @@ export default function ReviewForm({ isOpen, onClose, userId }) {
   };
 
   return (
-    // FIXED: Modern Flexbox Modal Structure (No more inline-block hacks)
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      
-      {/* 1. Backdrop / Overlay */}
       <div 
         className="absolute inset-0 bg-black/75 backdrop-blur-sm transition-opacity" 
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* 2. Modal Panel */}
-      <div className="relative w-full max-w-lg bg-white rounded-xl shadow-2xl overflow-hidden transform transition-all animate-in fade-in zoom-in duration-200">
+      <div className="relative w-full max-w-lg bg-white rounded-xl shadow-2xl overflow-hidden transform transition-all animate-in fade-in zoom-in duration-200 max-h-[90vh] overflow-y-auto">
         
-        {/* Header */}
-        <div className="bg-[#FFCC01] px-6 py-4 flex justify-between items-center">
+        <div className="bg-[#FFCC01] px-6 py-4 flex justify-between items-center sticky top-0 z-10">
           <h3 className="text-xl font-bold text-gray-900">Share your Experience</h3>
           <button 
-            type="button" // Always specify type="button" for non-submit buttons
+            type="button"
             onClick={onClose} 
             className="text-gray-900 hover:text-red-600 transition-colors"
           >
@@ -80,7 +75,6 @@ export default function ReviewForm({ isOpen, onClose, userId }) {
           </button>
         </div>
         
-        {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {error && (
             <div className="bg-red-50 border-l-4 border-red-500 p-3 rounded">
@@ -89,7 +83,7 @@ export default function ReviewForm({ isOpen, onClose, userId }) {
           )}
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Name</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Name <span className="text-red-500">*</span></label>
             <input 
               type="text" 
               required 
@@ -100,7 +94,7 @@ export default function ReviewForm({ isOpen, onClose, userId }) {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Consignment No. (PNR)</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Consignment No. (GCN) <span className="text-red-500">*</span></label>
             <input 
               type="text" 
               required 
@@ -110,9 +104,40 @@ export default function ReviewForm({ isOpen, onClose, userId }) {
               onChange={(e) => setFormData({...formData, pnr: e.target.value})}
             />
           </div>
+          <div className="grid grid-cols-2 gap-4">
+             <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Moving From <span className="text-red-500">*</span></label>
+                <div className="relative">
+                  <MapPin size={16} className="absolute left-3 top-3 text-gray-400" />
+                  <input 
+                    type="text" 
+                    required 
+                    placeholder="City"
+                    className="w-full pl-9 border-gray-300 rounded-lg shadow-sm p-2.5 border focus:ring-2 focus:ring-[#FFCC01] focus:border-[#FFCC01] outline-none transition"
+                    value={formData.fromLocation}
+                    onChange={(e) => setFormData({...formData, fromLocation: e.target.value})}
+                  />
+                </div>
+             </div>
+             <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Moving To <span className="text-red-500">*</span></label>
+                <div className="relative">
+                  <MapPin size={16} className="absolute left-3 top-3 text-gray-400" />
+                  <input 
+                    type="text" 
+                    required 
+                    placeholder="City"
+                    className="w-full pl-9 border-gray-300 rounded-lg shadow-sm p-2.5 border focus:ring-2 focus:ring-[#FFCC01] focus:border-[#FFCC01] outline-none transition"
+                    value={formData.toLocation}
+                    onChange={(e) => setFormData({...formData, toLocation: e.target.value})}
+                  />
+                </div>
+             </div>
+          </div>
+          {/* -------------------------------------- */}
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Service Used</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Service Used <span className="text-red-500">*</span></label>
             <select 
               className="w-full border-gray-300 rounded-lg shadow-sm p-2.5 border focus:ring-2 focus:ring-[#FFCC01] focus:border-[#FFCC01] outline-none transition bg-white"
               value={formData.serviceType}
@@ -126,7 +151,7 @@ export default function ReviewForm({ isOpen, onClose, userId }) {
           </div>
 
           <div>
-             <label className="block text-sm font-bold text-gray-700 mb-2">Rating</label>
+             <label className="block text-sm font-bold text-gray-700 mb-2">Give Rating <span className="text-red-500">*</span></label>
              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex justify-center">
                <StarRating 
                  rating={formData.rating} 
@@ -138,7 +163,7 @@ export default function ReviewForm({ isOpen, onClose, userId }) {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Review</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Share Your Experience<span className="text-red-500">*</span></label>
             <textarea 
               rows={3}
               required
