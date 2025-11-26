@@ -97,7 +97,7 @@ export default function ReviewForm({ isOpen, onClose, userId }) {
             <label className="block text-sm font-bold text-gray-700 mb-1">Consignment No. (GCN) <span className="text-red-500">*</span></label>
             <input 
               type="text" 
-              required 
+               
               placeholder="e.g. VRL88291"
               className="w-full border-gray-300 rounded-lg shadow-sm p-2.5 border focus:ring-2 focus:ring-[#FFCC01] focus:border-[#FFCC01] outline-none transition"
               value={formData.pnr}
