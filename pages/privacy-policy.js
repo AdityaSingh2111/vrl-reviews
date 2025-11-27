@@ -80,7 +80,7 @@ export default function PrivacyPolicy() {
                 According to Facebook Platform rules, we provide a way for you to request the deletion of your data. If you wish to remove your data from our system:
               </p>
               <ol className="list-decimal pl-5 mt-2 space-y-2">
-                <li>Send an email to our support team at <a href="mailto:privacy@vrllogistics.co.in" className="text-blue-600 underline">privacy@vrllogistics.co.in</a>.</li>
+                <li>Send an email to our support team at <a href="mailto:info@vrllogistics.co.in" className="text-blue-600 underline">info@vrllogistics.co.in</a>.</li>
                 <li>Include "Data Deletion Request" in the subject line.</li>
                 <li>We will permanently delete your account and associated reviews within 30 days.</li>
               </ol>
