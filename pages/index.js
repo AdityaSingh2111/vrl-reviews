@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { db, auth, googleProvider, facebookProvider } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc } from 'firebase/firestore';
@@ -83,7 +83,7 @@ const ScrollToTop = () => {
 const WarningModal = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen) {
-      const timer = setTimeout(onClose, 10000);
+      const timer = setTimeout(onClose, 8000);
       return () => clearTimeout(timer);
     }
   }, [isOpen, onClose]);
@@ -296,6 +296,9 @@ export default function Home() {
   const [currentVerifiedIndex, setCurrentVerifiedIndex] = useState(0);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const handleCloseWarning = useCallback(() => {
+    setIsWarningOpen(false);
+  }, []);
   // --- AUTH ---
   useEffect(() => {
     if (!auth) return;
@@ -433,7 +436,7 @@ export default function Home() {
           onClose={() => setIsProfileOpen(false)} user={user}
           onLogout={handleLogout}
         />
-        <WarningModal isOpen={isWarningOpen} onClose={() => setIsWarningOpen(false)} />
+        <WarningModal isOpen={isWarningOpen} onClose={handleCloseWarning} />
         <ScrollToTop />
 
         {/* Navbar */}
@@ -677,7 +680,7 @@ export default function Home() {
               ))}
             </div>
             <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto justify-end">
-              {/* --- CHANGED: Verified Only Toggle Button --- */}
+              {/* Verified Only Toggle Button --- */}
               <button
                 onClick={() => setShowVerifiedOnly(!showVerifiedOnly)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold border transition-all ${showVerifiedOnly ? 'bg-green-50 border-green-500 text-green-700' : 'bg-white border-gray-200 text-gray-500 hover:border-gray-400'}`}
@@ -736,7 +739,7 @@ export default function Home() {
                     </button>
                   </div>
 
-                  {/* --- CHANGED: Display From -> To Location --- */}
+                  {/* --- Display From -> To Location --- */}
                   {(review.fromLocation || review.toLocation) && (
                     <div className="flex items-center gap-2 mb-3 text-xs font-medium text-gray-500 bg-gray-50 p-2 rounded-lg border border-gray-100">
                       <MapPin size={14} className="text-[#DC2626]" />
@@ -771,7 +774,7 @@ export default function Home() {
             </div>
           )}
         </main>
-        {/* --- ADDED: CONTACT INFORMATION SECTION --- */}
+        {/* --- CONTACT INFORMATION SECTION --- */}
         <section id="contact-section" className="bg-white py-16 border-t border-gray-100">
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-12">
