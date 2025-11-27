@@ -144,6 +144,7 @@ export default function ReviewForm({ isOpen, onClose, userId }) {
               onChange={(e) => setFormData({...formData, serviceType: e.target.value})}
             >
               <option>Household Shifting</option>
+              <option>Commercial Shifting</option>
               <option>Car Transport</option>
               <option>Bike Transport</option>
               <option>Warehousing</option>
