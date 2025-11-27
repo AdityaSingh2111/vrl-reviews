@@ -198,78 +198,83 @@ const ProfileModal = ({ isOpen, onClose, user, onLogout }) => {
     <div className="fixed inset-0 z-[120] flex items-center justify-center px-4">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity" onClick={onClose} />
-
+      
       {/* Modal Card */}
       <div className="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-300">
         {/* Profile Header */}
         <div className="h-32 bg-gradient-to-r from-[#FFCC01] to-yellow-400 relative">
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full text-white transition-all z-20"
-          >
-            <X size={20} />
-          </button>
-          <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 z-10">
-            <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-gray-100 flex items-center justify-center">
-              {user.photoURL ? (
-                <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                <User size={64} className="text-gray-300" />
-              )}
+            <button 
+              onClick={onClose}
+              className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full text-white transition-all z-20"
+            >
+              <X size={20} />
+            </button>
+            <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 z-10">
+                <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-gray-100 flex items-center justify-center">
+                    {user.photoURL ? (
+                        <img src={user.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                        <User size={64} className="text-gray-300" />
+                    )}
+                </div>
+                {/* Verified Badge */}
+                {user.email && (
+                  <div className="absolute bottom-1 right-1 bg-white rounded-full p-[3px] shadow-sm" title="Verified User">
+                     <img 
+                       src="/blue-tick.png" 
+                       alt="Verified" 
+                       className="w-6 h-6 object-contain" 
+                     />
+                  </div>
+                )}
             </div>
-            {/* Verified Badge */}
-            {user.email && (
-              <div className="absolute bottom-2 right-2 bg-blue-500 text-white p-1.5 rounded-full border-2 border-white shadow-sm" title="Verified User">
-                <CheckCircle size={14} fill="currentColor" className="text-white" />
-              </div>
-            )}
-          </div>
         </div>
 
         {/* Profile Content */}
         <div className="px-8 pb-8 pt-20">
-
-          {/* User Info - No more margin-top needed */}
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900">{user.displayName || 'Guest User'}</h2>
-            <p className="text-sm text-gray-500 font-medium">{user.email || 'No email linked'}</p>
-          </div>
-          {/* Stats / Details Grid */}
-          <div className="mt-8 grid grid-cols-2 gap-4">
-            <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center gap-2">
-              <div className="bg-blue-100 p-2 rounded-full text-blue-600">
-                <Calendar size={18} />
-              </div>
-              <div className="text-center">
-                <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Joined</p>
-                <p className="text-xs font-bold text-gray-700">
-                  {user.metadata?.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString() : 'Recent'}
-                </p>
-              </div>
+            
+            {/* User Info - No more margin-top needed */}
+            <div className="text-center">
+                <h2 className="text-2xl font-bold text-gray-900">{user.displayName || 'Guest User'}</h2>
+                <p className="text-sm text-gray-500 font-medium">{user.email || 'No email linked'}</p>
             </div>
-            <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center gap-2">
-              <div className="bg-green-100 p-2 rounded-full text-green-600">
-                <Clock size={18} />
-              </div>
-              <div className="text-center">
-                <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Last Seen</p>
-                <p className="text-xs font-bold text-gray-700">
-                  {user.metadata?.lastSignInTime ? new Date(user.metadata.lastSignInTime).toLocaleDateString() : 'Now'}
-                </p>
-              </div>
-            </div>
-          </div>
 
-          {/* Logout Button */}
-          <div className="mt-8">
-            <button
-              onClick={() => { onClose(); onLogout(); }}
-              className="w-full py-3.5 bg-red-50 text-red-600 font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-red-200"
-            >
-              <LogOut size={20} />
-              Sign Out
-            </button>
-          </div>
+            {/* Stats / Details Grid */}
+            <div className="mt-8 grid grid-cols-2 gap-4">
+                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center gap-2">
+                    <div className="bg-blue-100 p-2 rounded-full text-blue-600">
+                        <Calendar size={18} />
+                    </div>
+                    <div className="text-center">
+                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Joined</p>
+                        <p className="text-xs font-bold text-gray-700">
+                          {user.metadata?.creationTime ? new Date(user.metadata.creationTime).toLocaleDateString() : 'Recent'}
+                        </p>
+                    </div>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center gap-2">
+                    <div className="bg-green-100 p-2 rounded-full text-green-600">
+                        <Clock size={18} />
+                    </div>
+                    <div className="text-center">
+                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Last Seen</p>
+                        <p className="text-xs font-bold text-gray-700">
+                          {user.metadata?.lastSignInTime ? new Date(user.metadata.lastSignInTime).toLocaleDateString() : 'Now'}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Logout Button */}
+            <div className="mt-8">
+                <button 
+                  onClick={() => { onClose(); onLogout(); }}
+                  className="w-full py-3.5 bg-red-50 text-red-600 font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-red-200"
+                >
+                    <LogOut size={20} />
+                    Sign Out
+                </button>
+            </div>
         </div>
       </div>
     </div>
@@ -347,6 +352,7 @@ export default function Home() {
     if (confirm("Are you sure you want to logout?")) {
       await signOut(auth);
       setIsProfileOpen(false);
+
     }
   };
 
@@ -415,462 +421,462 @@ export default function Home() {
     return { total, verifiedTotal, avg, distribution };
   }, [reviews]);
   //const handleAdminReply = async (reviewId) => {
-  return (
-    <div className="min-h-screen bg-gray-50 text-gray-800 font-sans">
-      <LoginModal
-        isOpen={showLoginModal}
-        onGoogleLogin={handleGoogleLogin}
-        onFacebookLogin={handleFacebookLogin}
-        onGuestLogin={handleGuestLogin}
-      />
-      <ProfileModal isOpen={isProfileOpen}
-        onClose={() => setIsProfileOpen(false)} user={user}
-        onLogout={handleLogout}
-      />
-      <WarningModal isOpen={isWarningOpen} onClose={() => setIsWarningOpen(false)} />
-      <ScrollToTop />
+    return (
+      <div className="min-h-screen bg-gray-50 text-gray-800 font-sans">
+        <LoginModal
+          isOpen={showLoginModal}
+          onGoogleLogin={handleGoogleLogin}
+          onFacebookLogin={handleFacebookLogin}
+          onGuestLogin={handleGuestLogin}
+        />
+        <ProfileModal isOpen={isProfileOpen}
+          onClose={() => setIsProfileOpen(false)} user={user}
+          onLogout={handleLogout}
+        />
+        <WarningModal isOpen={isWarningOpen} onClose={() => setIsWarningOpen(false)} />
+        <ScrollToTop />
 
-      {/* Navbar */}
-      <nav className="bg-white shadow-md sticky top-0 z-50 border-t-4 border-[#FFCC01]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-20">
-            <div className="flex items-center flex-shrink-0 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-              <Link href="/">
-                <img src="/vrl-logo.png" alt="VRL Logistics" className="h-35 w-auto object-contain" />
-              </Link>
-            </div>
+        {/* Navbar */}
+        <nav className="bg-white shadow-md sticky top-0 z-50 border-t-4 border-[#FFCC01]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between h-20">
+              <div className="flex items-center flex-shrink-0 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                <Link href="/">
+                  <img src="/vrl-logo.png" alt="VRL Logistics" className="h-35 w-auto object-contain" />
+                </Link>
+              </div>
 
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#contact-section" className="text-gray-600 hover:text-[#DC2626] font-medium transition">Contact</a>
-              <a href="https://vrllogistics.co.in/services" className="text-gray-600 hover:text-[#DC2626] font-medium transition">Services</a>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="bg-[#DC2626] hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-bold shadow-lg transition-all transform hover:-translate-y-0.5"
-              >
-                Write a Review
-              </button>
+              <div className="hidden md:flex items-center space-x-8">
+                <a href="#contact-section" className="text-gray-600 hover:text-[#DC2626] font-medium transition">Contact</a>
+                <a href="https://vrllogistics.co.in/services" className="text-gray-600 hover:text-[#DC2626] font-medium transition">Services</a>
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="bg-[#DC2626] hover:bg-red-700 text-white px-6 py-2.5 rounded-full font-bold shadow-lg transition-all transform hover:-translate-y-0.5"
+                >
+                  Write a Review
+                </button>
 
 
-              {user ? (
-                <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
-                  <button
-                    onClick={() => setIsProfileOpen(true)}
-                    className="flex items-center gap-2 group hover:bg-gray-50 p-1.5 rounded-lg transition-all"
-                  >
-                    {user.photoURL ? (
-                      <img src={user.photoURL} alt="User" className="w-9 h-9 rounded-full border-2 border-gray-200 group-hover:border-[#FFCC01] transition-colors object-cover" />
-                    ) : (
-                      <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 border-2 border-transparent group-hover:border-[#FFCC01] transition-colors">
-                        <User size={18} />
+                {user ? (
+                  <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
+                    <button
+                      onClick={() => setIsProfileOpen(true)}
+                      className="flex items-center gap-2 group hover:bg-gray-50 p-1.5 rounded-lg transition-all"
+                    >
+                      {user.photoURL ? (
+                        <img src={user.photoURL} alt="User" className="w-9 h-9 rounded-full border-2 border-gray-200 group-hover:border-[#FFCC01] transition-colors object-cover" />
+                      ) : (
+                        <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 border-2 border-transparent group-hover:border-[#FFCC01] transition-colors">
+                          <User size={18} />
+                        </div>
+                      )}
+                      <div className="flex flex-col text-left">
+                        <span className="text-xs font-bold text-gray-900 leading-none group-hover:text-[#DC2626] transition-colors">
+                          {user.displayName ? user.displayName.split(' ')[0] : 'Guest'}
+                        </span>
+                        <span className="text-[10px] text-gray-400 font-medium">View Profile</span>
                       </div>
-                    )}
-                    <div className="flex flex-col text-left">
-                      <span className="text-xs font-bold text-gray-900 leading-none group-hover:text-[#DC2626] transition-colors">
-                        {user.displayName ? user.displayName.split(' ')[0] : 'Guest'}
-                      </span>
-                      <span className="text-[10px] text-gray-400 font-medium">View Profile</span>
-                    </div>
+                    </button>
+                  </div>
+                ) : (
+                  <button onClick={() => setShowLoginModal(true)} className="flex items-center gap-2 text-gray-600 hover:text-[#DC2626] font-medium transition">
+                    <LogIn size={20} /> Login
                   </button>
-                </div>
+                )}
+                {/* -------------------------------------- */}
+              </div>
+
+              <div className="flex items-center md:hidden">
+                <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-600 p-2">
+                  {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {isMobileMenuOpen && (
+            <div className="md:hidden absolute top-20 left-0 w-full bg-white/95 backdrop-blur-md border-b border-[#FFCC01] p-4 space-y-4 shadow-xl z-40">
+              <a href="#contact-section" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 hover:bg-[#FFF8E1] rounded-lg">Contact</a>
+              <a href="https://vrllogistics.co.in/services" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 hover:bg-[#FFF8E1] rounded-lg">Services</a>
+
+              {/* --- Mobile Menu Login --- */}
+              {user ? (
+                <button
+                  onClick={() => { setIsProfileOpen(true); setIsMobileMenuOpen(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-gray-800 font-bold bg-gray-50 rounded-lg border border-gray-200"
+                >
+                  {user.photoURL ? (
+                    <img src={user.photoURL} className="w-6 h-6 rounded-full" alt="Profile" />
+                  ) : <User size={18} />}
+                  My Profile
+                </button>
               ) : (
-                <button onClick={() => setShowLoginModal(true)} className="flex items-center gap-2 text-gray-600 hover:text-[#DC2626] font-medium transition">
-                  <LogIn size={20} /> Login
+                <button onClick={() => { setShowLoginModal(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-bold">
+                  <LogIn size={18} /> Login
                 </button>
               )}
-              {/* -------------------------------------- */}
+              <button onClick={() => { setIsModalOpen(true); setIsMobileMenuOpen(false); }} className="w-full bg-[#DC2626] text-white py-3 rounded-lg font-bold">Write a Review</button>
+            </div>
+          )}
+        </nav>
+
+        {/* Hero */}
+        <div className="relative bg-[#111] text-white overflow-hidden">
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-[#FFCC01] opacity-10 skew-x-12 transform translate-x-20"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#DC2626] opacity-10 rounded-full blur-3xl"></div>
+
+          <div className="relative max-w-7xl mx-auto px-4 py-12 md:py-20 flex flex-col md:flex-row items-center justify-between">
+            <div className="md:w-1/2 mb-12 md:mb-0 z-10 text-center md:text-left">
+              <div className="inline-block bg-white/10 backdrop-blur-md border border-[#FFCC01]/30 rounded-full px-4 py-1 mb-6">
+                <span className="text-[#FFCC01] font-bold text-sm">★ India's No.1 Logistics Partner</span>
+              </div>
+              <div className="inline-flex items-center gap-2 bg-[#DC2626]/20 border border-[#DC2626] rounded-full px-4 py-1.5 mb-6 backdrop-blur-sm">
+                <CheckCircle size={16} className="text-[#FFCC01]" />
+                <span className="text-white font-bold text-xs md:text-sm uppercase tracking-wider">Genuine & Most Trusted Review Portal</span>
+              </div>
+              <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+                Trust delivered <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFCC01] to-yellow-200">Across India</span>
+              </h2>
+              <p className="text-gray-400 text-lg md:text-xl mb-8 max-w-lg leading-relaxed mx-auto md:mx-0">
+                Join <span className="text-white font-bold">{stats.total}+</span> happy customers who have shared their genuine relocation experiences with us.
+              </p>
+              <div className="flex gap-4 justify-center md:justify-start">
+                <button onClick={() => setIsModalOpen(true)} className="bg-[#FFCC01] text-black px-8 py-3.5 rounded-lg font-bold hover:bg-yellow-400 transition shadow-lg active:scale-95">Share Feedback</button>
+              </div>
             </div>
 
-            <div className="flex items-center md:hidden">
-              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="text-gray-600 p-2">
-                {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-              </button>
+            <div className="md:w-1/3 w-full relative z-10 flex flex-col gap-6">
+
+              {/* --- Stats Card --- */}
+              <div className="bg-white/5 backdrop-blur-lg border border-[#FFCC01]/20 p-8 rounded-2xl shadow-2xl relative">
+                <div className="flex items-end gap-3 mb-2">
+                  <span className="text-6xl font-bold text-white">{stats.avg}</span>
+                  <span className="text-xl text-gray-400 mb-2">/ 5</span>
+                </div>
+                <div className="mb-4"><StarRating rating={Math.round(stats.avg)} size={6} /></div>
+
+                {/* --- Compact Stats Row (Smart Space Management) --- */}
+                <div className="flex items-center justify-between mb-6 border-y border-white/10 py-3">
+                  {/* Total Reviews Section */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl font-bold text-white leading-none">{stats.total}</span>
+                    <span className="text-xs text-gray-400 uppercase tracking-wide font-medium">Total</span>
+                  </div>
+
+                  {/* Vertical Divider */}
+                  <div className="h-8 w-px bg-white/10"></div>
+
+                  {/* Verified Reviews Section (Highlighted) */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl font-bold text-[#FFCC01] leading-none">{stats.verifiedTotal}</span>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-[#FFCC01] uppercase tracking-wide leading-tight">Verified</span>
+                      <span className="text-[10px] text-gray-400 uppercase tracking-wide leading-tight">Reviews</span>
+                    </div>
+                  </div>
+                </div>
+                {/* --------------------------------------------------------- */}
+
+                <div className="space-y-2">
+                  {[5, 4, 3, 2, 1].map((star) => (
+                    <div key={star} className="flex items-center gap-3 text-xs">
+                      <span className="w-3 text-gray-400">{star}</span>
+                      <div className="flex-1 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${star >= 4 ? 'bg-[#FFCC01]' : 'bg-gray-500'}`}
+                          style={{ width: `${stats.total ? (stats.distribution[star] / stats.total) * 100 : 0}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* --- Live Verified Review Carousel --- */}
+              <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-2xl relative min-h-[280px] flex flex-col justify-between">
+
+                {/* Header of Card */}
+                <div className="flex justify-between items-center border-b border-white/10 pb-4 mb-4">
+                  <div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl font-bold text-white">{stats.verifiedTotal}</span>
+                      <span className="text-sm text-[#FFCC01] font-bold uppercase">Verified Reviews</span>
+                    </div>
+                    <p className="text-xs text-gray-400">Live updates from real customers</p>
+                  </div>
+                  <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center text-green-400 animate-pulse">
+                    <CheckCircle size={24} />
+                  </div>
+                </div>
+
+                {/* Animated Review Content (Page Turn Animation) */}
+                {verifiedReviews.length > 0 ? (
+                  <div
+                    key={currentVerifiedIndex}
+                    className="animate-page-turn"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-full bg-[#FFCC01] text-black flex items-center justify-center font-bold shadow-lg">
+                        {verifiedReviews[currentVerifiedIndex].name.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-bold text-white text-sm tracking-wide">{verifiedReviews[currentVerifiedIndex].name}</p>
+                        <div className="flex text-[#FFCC01]"><StarRating rating={verifiedReviews[currentVerifiedIndex].rating} size={3} /></div>
+                      </div>
+                    </div>
+
+                    {/* Location Display */}
+                    {(verifiedReviews[currentVerifiedIndex].fromLocation || verifiedReviews[currentVerifiedIndex].toLocation) && (
+                      <div className="flex items-center gap-2 my-3 text-xs font-medium text-gray-300 bg-white/5 p-2 rounded-lg border border-white/10">
+                        <MapPin size={14} className="text-[#FFCC01]" />
+                        <span className="truncate max-w-[100px]">{verifiedReviews[currentVerifiedIndex].fromLocation || 'Origin'}</span>
+                        <span className="text-gray-500">➝</span>
+                        <span className="truncate max-w-[100px]">{verifiedReviews[currentVerifiedIndex].toLocation || 'Dest.'}</span>
+                      </div>
+                    )}
+
+                    <div className="relative mt-3">
+                      <Quote
+                        size={24}
+                        className="absolute top-0 left-0 text-[#FFCC01] opacity-60 transform scale-x-[-1]"
+                      />
+
+                      {/* Text added with left padding (pl-8) to make room for the icon */}
+                      <p className="text-gray-200 text-sm italic font-light leading-relaxed pl-8 relative z-10">
+                        {verifiedReviews[currentVerifiedIndex].comment.substring(0, 120)}...
+                      </p>
+                    </div>
+                    {/* ----------------------------------- */}
+
+                    <div className="mt-4 flex justify-between items-center border-t border-white/10 pt-3">
+                      <span className="text-xs text-gray-400 font-mono tracking-wider">GCN: {verifiedReviews[currentVerifiedIndex].pnr}</span>
+                      <span className="bg-[#FFCC01]/20 text-[#FFCC01] px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-[#FFCC01]/30">
+                        Verified Customer
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-gray-400 text-center py-10 animate-pulse">Waiting for verified reviews...</div>
+                )}
+              </div>
+
             </div>
           </div>
         </div>
 
-        {isMobileMenuOpen && (
-          <div className="md:hidden absolute top-20 left-0 w-full bg-white/95 backdrop-blur-md border-b border-[#FFCC01] p-4 space-y-4 shadow-xl z-40">
-            <a href="#contact-section" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 hover:bg-[#FFF8E1] rounded-lg">Contact</a>
-            <a href="https://vrllogistics.co.in/services" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 hover:bg-[#FFF8E1] rounded-lg">Services</a>
+        {/* Main Content */}
+        {/* Filters */}
+        <main className="max-w-7xl mx-auto px-4 py-12 -mt-10 relative z-20">
+          {error && <div className="bg-red-50 border-l-4 border-[#DC2626] p-4 mb-8 rounded-r-lg"><p className="text-[#DC2626] font-medium">{error}</p></div>}
 
-            {/* --- Mobile Menu Login --- */}
-            {user ? (
+          <div className="bg-white p-4 rounded-xl shadow-lg border-t-4 border-[#FFCC01] mb-8 flex flex-col lg:flex-row justify-between items-center gap-4">
+            {/* Categories */}
+            <div className="flex items-center gap-2 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 no-scrollbar">
+              {['All', 'Household', 'Car Transport', 'Bike Transport', 'Warehousing'].map((cat) => (
+                <button key={cat} onClick={() => setFilterCategory(cat)} className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${filterCategory === cat ? 'bg-[#DC2626] text-white' : 'bg-gray-100 text-gray-600 hover:bg-[#FFF8E1]'}`}>{cat}</button>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto justify-end">
+              {/* --- CHANGED: Verified Only Toggle Button --- */}
               <button
-                onClick={() => { setIsProfileOpen(true); setIsMobileMenuOpen(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-gray-800 font-bold bg-gray-50 rounded-lg border border-gray-200"
+                onClick={() => setShowVerifiedOnly(!showVerifiedOnly)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold border transition-all ${showVerifiedOnly ? 'bg-green-50 border-green-500 text-green-700' : 'bg-white border-gray-200 text-gray-500 hover:border-gray-400'}`}
               >
-                {user.photoURL ? (
-                  <img src={user.photoURL} className="w-6 h-6 rounded-full" alt="Profile" />
-                ) : <User size={18} />}
-                My Profile
+                <CheckCircle size={16} className={showVerifiedOnly ? 'fill-green-500 text-white' : ''} />
+                Verified Only
               </button>
-            ) : (
-              <button onClick={() => { setShowLoginModal(true); setIsMobileMenuOpen(false); }} className="w-full flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-bold">
-                <LogIn size={18} /> Login
-              </button>
-            )}
-            <button onClick={() => { setIsModalOpen(true); setIsMobileMenuOpen(false); }} className="w-full bg-[#DC2626] text-white py-3 rounded-lg font-bold">Write a Review</button>
-          </div>
-        )}
-      </nav>
 
-      {/* Hero */}
-      <div className="relative bg-[#111] text-white overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-[#FFCC01] opacity-10 skew-x-12 transform translate-x-20"></div>
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#DC2626] opacity-10 rounded-full blur-3xl"></div>
-
-        <div className="relative max-w-7xl mx-auto px-4 py-12 md:py-20 flex flex-col md:flex-row items-center justify-between">
-          <div className="md:w-1/2 mb-12 md:mb-0 z-10 text-center md:text-left">
-            <div className="inline-block bg-white/10 backdrop-blur-md border border-[#FFCC01]/30 rounded-full px-4 py-1 mb-6">
-              <span className="text-[#FFCC01] font-bold text-sm">★ India's No.1 Logistics Partner</span>
-            </div>
-            <div className="inline-flex items-center gap-2 bg-[#DC2626]/20 border border-[#DC2626] rounded-full px-4 py-1.5 mb-6 backdrop-blur-sm">
-              <CheckCircle size={16} className="text-[#FFCC01]" />
-              <span className="text-white font-bold text-xs md:text-sm uppercase tracking-wider">Genuine & Most Trusted Review Portal</span>
-            </div>
-            <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
-              Trust delivered <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFCC01] to-yellow-200">Across India</span>
-            </h2>
-            <p className="text-gray-400 text-lg md:text-xl mb-8 max-w-lg leading-relaxed mx-auto md:mx-0">
-              Join <span className="text-white font-bold">{stats.total}+</span> happy customers who have shared their genuine relocation experiences with us.
-            </p>
-            <div className="flex gap-4 justify-center md:justify-start">
-              <button onClick={() => setIsModalOpen(true)} className="bg-[#FFCC01] text-black px-8 py-3.5 rounded-lg font-bold hover:bg-yellow-400 transition shadow-lg active:scale-95">Share Feedback</button>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500 font-medium hidden sm:block">Sort by:</span>
+                <div className="relative">
+                  <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFCC01]">
+                    <option value="Newest">Newest First</option>
+                    <option value="Highest">Highest Rated</option>
+                    <option value="Lowest">Lowest Rated</option>
+                  </select>
+                  <ChevronDown size={16} className="absolute right-3 top-3 text-gray-500 pointer-events-none" />
+                </div>
+              </div>
             </div>
           </div>
-
-          <div className="md:w-1/3 w-full relative z-10 flex flex-col gap-6">
-
-            {/* --- Stats Card --- */}
-            <div className="bg-white/5 backdrop-blur-lg border border-[#FFCC01]/20 p-8 rounded-2xl shadow-2xl relative">
-              <div className="flex items-end gap-3 mb-2">
-                <span className="text-6xl font-bold text-white">{stats.avg}</span>
-                <span className="text-xl text-gray-400 mb-2">/ 5</span>
-              </div>
-              <div className="mb-4"><StarRating rating={Math.round(stats.avg)} size={6} /></div>
-
-              {/* --- Compact Stats Row (Smart Space Management) --- */}
-              <div className="flex items-center justify-between mb-6 border-y border-white/10 py-3">
-                {/* Total Reviews Section */}
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-white leading-none">{stats.total}</span>
-                  <span className="text-xs text-gray-400 uppercase tracking-wide font-medium">Total</span>
-                </div>
-
-                {/* Vertical Divider */}
-                <div className="h-8 w-px bg-white/10"></div>
-
-                {/* Verified Reviews Section (Highlighted) */}
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl font-bold text-[#FFCC01] leading-none">{stats.verifiedTotal}</span>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-bold text-[#FFCC01] uppercase tracking-wide leading-tight">Verified</span>
-                    <span className="text-[10px] text-gray-400 uppercase tracking-wide leading-tight">Reviews</span>
-                  </div>
-                </div>
-              </div>
-              {/* --------------------------------------------------------- */}
-
-              <div className="space-y-2">
-                {[5, 4, 3, 2, 1].map((star) => (
-                  <div key={star} className="flex items-center gap-3 text-xs">
-                    <span className="w-3 text-gray-400">{star}</span>
-                    <div className="flex-1 h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${star >= 4 ? 'bg-[#FFCC01]' : 'bg-gray-500'}`}
-                        style={{ width: `${stats.total ? (stats.distribution[star] / stats.total) * 100 : 0}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {loading ? (
+            <div className="text-center py-32"><div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#FFCC01] mx-auto mb-4"></div><p>Fetching reviews...</p></div>
+          ) : processedReviews.length === 0 ? (
+            <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
+              <MessageSquare className="text-[#FFCC01] mx-auto mb-6" size={32} />
+              <h3 className="text-xl font-bold mb-2">No reviews found</h3>
+              <button onClick={() => setIsModalOpen(true)} className="bg-[#DC2626] text-white px-8 py-3 rounded-lg font-bold shadow-lg hover:bg-red-700 transition mt-4">Write First Review</button>
             </div>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {processedReviews.map((review) => (
+                <TiltCard key={review.id} className="group bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl relative overflow-hidden flex flex-col h-full transition-all duration-300">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#FFCC01] to-[#DC2626] opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
-            {/* --- Live Verified Review Carousel --- */}
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-6 rounded-2xl shadow-2xl relative min-h-[280px] flex flex-col justify-between">
-
-              {/* Header of Card */}
-              <div className="flex justify-between items-center border-b border-white/10 pb-4 mb-4">
-                <div>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-bold text-white">{stats.verifiedTotal}</span>
-                    <span className="text-sm text-[#FFCC01] font-bold uppercase">Verified Reviews</span>
-                  </div>
-                  <p className="text-xs text-gray-400">Live updates from real customers</p>
-                </div>
-                <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center text-green-400 animate-pulse">
-                  <CheckCircle size={24} />
-                </div>
-              </div>
-
-              {/* Animated Review Content (Page Turn Animation) */}
-              {verifiedReviews.length > 0 ? (
-                <div
-                  key={currentVerifiedIndex}
-                  className="animate-page-turn"
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-full bg-[#FFCC01] text-black flex items-center justify-center font-bold shadow-lg">
-                      {verifiedReviews[currentVerifiedIndex].name.charAt(0)}
+                  {/* Header */}
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 text-lg border-2 border-white shadow-sm group-hover:border-[#FFCC01] transition-colors">
+                        {review.name ? review.name.charAt(0).toUpperCase() : 'U'}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-gray-900 group-hover:text-[#DC2626] transition-colors">{review.name}</h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[10px] font-bold uppercase text-gray-500 border border-gray-200 px-1.5 py-0.5 rounded bg-white">{review.serviceType}</span>
+                          {review.verified && (
+                            <span className="text-green-700 flex items-center gap-0.5 text-[10px] font-bold bg-green-50 px-1.5 py-0.5 rounded border border-green-100">
+                              <CheckCircle size={10} /> Verified
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-bold text-white text-sm tracking-wide">{verifiedReviews[currentVerifiedIndex].name}</p>
-                      <div className="flex text-[#FFCC01]"><StarRating rating={verifiedReviews[currentVerifiedIndex].rating} size={3} /></div>
-                    </div>
+                    <button onClick={() => handleAdminReply(review.id)} className="text-gray-300 hover:text-blue-600 p-1 rounded transition-colors" title="Admin Reply">
+                      <Reply size={16} />
+                    </button>
                   </div>
 
-                  {/* Location Display */}
-                  {(verifiedReviews[currentVerifiedIndex].fromLocation || verifiedReviews[currentVerifiedIndex].toLocation) && (
-                    <div className="flex items-center gap-2 my-3 text-xs font-medium text-gray-300 bg-white/5 p-2 rounded-lg border border-white/10">
-                      <MapPin size={14} className="text-[#FFCC01]" />
-                      <span className="truncate max-w-[100px]">{verifiedReviews[currentVerifiedIndex].fromLocation || 'Origin'}</span>
-                      <span className="text-gray-500">➝</span>
-                      <span className="truncate max-w-[100px]">{verifiedReviews[currentVerifiedIndex].toLocation || 'Dest.'}</span>
+                  {/* --- CHANGED: Display From -> To Location --- */}
+                  {(review.fromLocation || review.toLocation) && (
+                    <div className="flex items-center gap-2 mb-3 text-xs font-medium text-gray-500 bg-gray-50 p-2 rounded-lg border border-gray-100">
+                      <MapPin size={14} className="text-[#DC2626]" />
+                      <span className="truncate max-w-[80px]">{review.fromLocation || 'Origin'}</span>
+                      <span className="text-gray-300">➝</span>
+                      <span className="truncate max-w-[80px]">{review.toLocation || 'Dest.'}</span>
+                    </div>
+                  )}
+                  {/* ------------------------------------------- */}
+
+                  <div className="mb-3"><StarRating rating={review.rating} size={4} /></div>
+
+                  <p className="text-gray-600 text-sm leading-relaxed mb-4 flex-grow">"{review.comment}"</p>
+
+                  {/* Admin Reply Section */}
+                  {review.adminReply && (
+                    <div className="mt-auto mb-4 bg-amber-50 border-l-4 border-[#FFCC01] p-3 rounded-r text-sm animate-in fade-in slide-in-from-left-2">
+                      <p className="font-bold text-gray-900 text-xs mb-1.5 flex items-center gap-1.5">
+                        <img src="/vrl-logo.png" className="w-4 h-4 object-contain" alt="Admin" />
+                        <span>Official Response</span>
+                      </p>
+                      <p className="text-gray-700 text-xs leading-relaxed italic">"{review.adminReply}"</p>
                     </div>
                   )}
 
-                  <div className="relative mt-3">
-                    <Quote
-                      size={24}
-                      className="absolute top-0 left-0 text-[#FFCC01] opacity-60 transform scale-x-[-1]"
-                    />
-
-                    {/* Text added with left padding (pl-8) to make room for the icon */}
-                    <p className="text-gray-200 text-sm italic font-light leading-relaxed pl-8 relative z-10">
-                      {verifiedReviews[currentVerifiedIndex].comment.substring(0, 120)}...
-                    </p>
+                  <div className="pt-4 border-t border-gray-50 flex justify-between items-center text-xs text-gray-400 font-medium">
+                    <span className="font-mono">GCN: {review.pnr}</span>
+                    <span>{review.createdAt ? review.createdAt.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent'}</span>
                   </div>
-                  {/* ----------------------------------- */}
+                </TiltCard>
+              ))}
+            </div>
+          )}
+        </main>
+        {/* --- ADDED: CONTACT INFORMATION SECTION --- */}
+        <section id="contact-section" className="bg-white py-16 border-t border-gray-100">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Get in Touch</h2>
+              <p className="text-gray-500 max-w-xl mx-auto">We are here to help you. Reach out to us via any of the following channels.</p>
+            </div>
 
-                  <div className="mt-4 flex justify-between items-center border-t border-white/10 pt-3">
-                    <span className="text-xs text-gray-400 font-mono tracking-wider">GCN: {verifiedReviews[currentVerifiedIndex].pnr}</span>
-                    <span className="bg-[#FFCC01]/20 text-[#FFCC01] px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-[#FFCC01]/30">
-                      Verified Customer
-                    </span>
-                  </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Address Card */}
+              <div className="bg-gray-50 p-8 rounded-2xl text-center hover:shadow-lg transition-all duration-300 border border-transparent hover:border-[#FFCC01] group">
+                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm text-[#DC2626] group-hover:bg-[#DC2626] group-hover:text-white transition-colors">
+                  <MapPin size={32} />
                 </div>
-              ) : (
-                <div className="text-gray-400 text-center py-10 animate-pulse">Waiting for verified reviews...</div>
-              )}
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      {/* Filters */}
-      <main className="max-w-7xl mx-auto px-4 py-12 -mt-10 relative z-20">
-        {error && <div className="bg-red-50 border-l-4 border-[#DC2626] p-4 mb-8 rounded-r-lg"><p className="text-[#DC2626] font-medium">{error}</p></div>}
-
-        <div className="bg-white p-4 rounded-xl shadow-lg border-t-4 border-[#FFCC01] mb-8 flex flex-col lg:flex-row justify-between items-center gap-4">
-          {/* Categories */}
-          <div className="flex items-center gap-2 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 no-scrollbar">
-            {['All', 'Household', 'Car Transport', 'Bike Transport', 'Warehousing'].map((cat) => (
-              <button key={cat} onClick={() => setFilterCategory(cat)} className={`px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${filterCategory === cat ? 'bg-[#DC2626] text-white' : 'bg-gray-100 text-gray-600 hover:bg-[#FFF8E1]'}`}>{cat}</button>
-            ))}
-          </div>
-          <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto justify-end">
-            {/* --- CHANGED: Verified Only Toggle Button --- */}
-            <button
-              onClick={() => setShowVerifiedOnly(!showVerifiedOnly)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold border transition-all ${showVerifiedOnly ? 'bg-green-50 border-green-500 text-green-700' : 'bg-white border-gray-200 text-gray-500 hover:border-gray-400'}`}
-            >
-              <CheckCircle size={16} className={showVerifiedOnly ? 'fill-green-500 text-white' : ''} />
-              Verified Only
-            </button>
-
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500 font-medium hidden sm:block">Sort by:</span>
-              <div className="relative">
-                <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFCC01]">
-                  <option value="Newest">Newest First</option>
-                  <option value="Highest">Highest Rated</option>
-                  <option value="Lowest">Lowest Rated</option>
-                </select>
-                <ChevronDown size={16} className="absolute right-3 top-3 text-gray-500 pointer-events-none" />
+                <h3 className="font-bold text-lg text-gray-900 mb-2">Corporate Office</h3>
+                <p className="text-gray-600 leading-relaxed text-sm">
+                  35, 2nd cross, Hsr Layout, 8th sector,<br />
+                  Bommanahalli, Bengaluru - 560 068, Karnataka
+                </p>
               </div>
-            </div>
-          </div>
-        </div>
-        {loading ? (
-          <div className="text-center py-32"><div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#FFCC01] mx-auto mb-4"></div><p>Fetching reviews...</p></div>
-        ) : processedReviews.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
-            <MessageSquare className="text-[#FFCC01] mx-auto mb-6" size={32} />
-            <h3 className="text-xl font-bold mb-2">No reviews found</h3>
-            <button onClick={() => setIsModalOpen(true)} className="bg-[#DC2626] text-white px-8 py-3 rounded-lg font-bold shadow-lg hover:bg-red-700 transition mt-4">Write First Review</button>
-          </div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {processedReviews.map((review) => (
-              <TiltCard key={review.id} className="group bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-xl relative overflow-hidden flex flex-col h-full transition-all duration-300">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#FFCC01] to-[#DC2626] opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
-                {/* Header */}
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600 text-lg border-2 border-white shadow-sm group-hover:border-[#FFCC01] transition-colors">
-                      {review.name ? review.name.charAt(0).toUpperCase() : 'U'}
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-gray-900 group-hover:text-[#DC2626] transition-colors">{review.name}</h4>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] font-bold uppercase text-gray-500 border border-gray-200 px-1.5 py-0.5 rounded bg-white">{review.serviceType}</span>
-                        {review.verified && (
-                          <span className="text-green-700 flex items-center gap-0.5 text-[10px] font-bold bg-green-50 px-1.5 py-0.5 rounded border border-green-100">
-                            <CheckCircle size={10} /> Verified
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <button onClick={() => handleAdminReply(review.id)} className="text-gray-300 hover:text-blue-600 p-1 rounded transition-colors" title="Admin Reply">
-                    <Reply size={16} />
-                  </button>
+              {/* Email Card */}
+              <div className="bg-gray-50 p-8 rounded-2xl text-center hover:shadow-lg transition-all duration-300 border border-transparent hover:border-[#FFCC01] group">
+                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm text-[#DC2626] group-hover:bg-[#DC2626] group-hover:text-white transition-colors">
+                  <Mail size={32} />
                 </div>
+                <h3 className="font-bold text-lg text-gray-900 mb-2">Email Us</h3>
+                <p className="text-gray-600 leading-relaxed text-sm">
+                  <a href="mailto:info@vrllogistics.co.in" className="hover:text-[#DC2626] transition-colors">info@vrllogistics.co.in</a>
+                </p>
+              </div>
 
-                {/* --- CHANGED: Display From -> To Location --- */}
-                {(review.fromLocation || review.toLocation) && (
-                  <div className="flex items-center gap-2 mb-3 text-xs font-medium text-gray-500 bg-gray-50 p-2 rounded-lg border border-gray-100">
-                    <MapPin size={14} className="text-[#DC2626]" />
-                    <span className="truncate max-w-[80px]">{review.fromLocation || 'Origin'}</span>
-                    <span className="text-gray-300">➝</span>
-                    <span className="truncate max-w-[80px]">{review.toLocation || 'Dest.'}</span>
-                  </div>
-                )}
-                {/* ------------------------------------------- */}
-
-                <div className="mb-3"><StarRating rating={review.rating} size={4} /></div>
-
-                <p className="text-gray-600 text-sm leading-relaxed mb-4 flex-grow">"{review.comment}"</p>
-
-                {/* Admin Reply Section */}
-                {review.adminReply && (
-                  <div className="mt-auto mb-4 bg-amber-50 border-l-4 border-[#FFCC01] p-3 rounded-r text-sm animate-in fade-in slide-in-from-left-2">
-                    <p className="font-bold text-gray-900 text-xs mb-1.5 flex items-center gap-1.5">
-                      <img src="/vrl-logo.png" className="w-4 h-4 object-contain" alt="Admin" />
-                      <span>Official Response</span>
-                    </p>
-                    <p className="text-gray-700 text-xs leading-relaxed italic">"{review.adminReply}"</p>
-                  </div>
-                )}
-
-                <div className="pt-4 border-t border-gray-50 flex justify-between items-center text-xs text-gray-400 font-medium">
-                  <span className="font-mono">GCN: {review.pnr}</span>
-                  <span>{review.createdAt ? review.createdAt.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent'}</span>
+              {/* Phone Card */}
+              <div className="bg-gray-50 p-8 rounded-2xl text-center hover:shadow-lg transition-all duration-300 border border-transparent hover:border-[#FFCC01] group">
+                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm text-[#DC2626] group-hover:bg-[#DC2626] group-hover:text-white transition-colors">
+                  <Phone size={32} />
                 </div>
-              </TiltCard>
-            ))}
-          </div>
-        )}
-      </main>
-      {/* --- ADDED: CONTACT INFORMATION SECTION --- */}
-      <section id="contact-section" className="bg-white py-16 border-t border-gray-100">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Get in Touch</h2>
-            <p className="text-gray-500 max-w-xl mx-auto">We are here to help you. Reach out to us via any of the following channels.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Address Card */}
-            <div className="bg-gray-50 p-8 rounded-2xl text-center hover:shadow-lg transition-all duration-300 border border-transparent hover:border-[#FFCC01] group">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm text-[#DC2626] group-hover:bg-[#DC2626] group-hover:text-white transition-colors">
-                <MapPin size={32} />
+                <h3 className="font-bold text-lg text-gray-900 mb-2">Call Us</h3>
+                <p className="text-gray-600 leading-relaxed text-sm">
+                  <a href="tel:+917338795585" className="block hover:text-[#DC2626] transition-colors">+91 7338795585 (Branch Office)</a>
+                  <a href="tel:+919344147584" className="block hover:text-[#DC2626] transition-colors">+91 9344147584 (Customer Support)</a>
+                </p>
               </div>
-              <h3 className="font-bold text-lg text-gray-900 mb-2">Corporate Office</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">
-                35, 2nd cross, Hsr Layout, 8th sector,<br />
-                Bommanahalli, Bengaluru - 560 068, Karnataka
-              </p>
-            </div>
-
-            {/* Email Card */}
-            <div className="bg-gray-50 p-8 rounded-2xl text-center hover:shadow-lg transition-all duration-300 border border-transparent hover:border-[#FFCC01] group">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm text-[#DC2626] group-hover:bg-[#DC2626] group-hover:text-white transition-colors">
-                <Mail size={32} />
-              </div>
-              <h3 className="font-bold text-lg text-gray-900 mb-2">Email Us</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">
-                <a href="mailto:info@vrllogistics.co.in" className="hover:text-[#DC2626] transition-colors">info@vrllogistics.co.in</a>
-              </p>
-            </div>
-
-            {/* Phone Card */}
-            <div className="bg-gray-50 p-8 rounded-2xl text-center hover:shadow-lg transition-all duration-300 border border-transparent hover:border-[#FFCC01] group">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm text-[#DC2626] group-hover:bg-[#DC2626] group-hover:text-white transition-colors">
-                <Phone size={32} />
-              </div>
-              <h3 className="font-bold text-lg text-gray-900 mb-2">Call Us</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">
-                <a href="tel:+917338795585" className="block hover:text-[#DC2626] transition-colors">+91 7338795585 (Branch Office)</a>
-                <a href="tel:+919344147584" className="block hover:text-[#DC2626] transition-colors">+91 9344147584 (Customer Support)</a>
-              </p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* --- 5. FOOTER (BRANDED) --- */}
-      <footer className="bg-gray-900 text-white pt-16 pb-8 border-t-4 border-[#FFCC01]">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-          <div className="col-span-1 md:col-span-2">
-            <div className="mb-6">
-              <img
-                src="/vrl-logo.png"
-                alt="VRL Logistics Packers and Movers"
-                className="h-42 w-auto object-contain brightness-0 invert" // 'brightness-0 invert' makes a black logo white for dark footers
-              />
-            </div>
-            <p className="text-gray-400 max-w-sm leading-relaxed mb-6">
-              VRL Logistics Packers and Movers is a well-established logistics company in India, known for its reliable and efficient services.
-              The company's loading services are a key part of its comprehensive logistics solutions.
-            </p>
-            {/* <div className="flex gap-4">
+        {/* --- 5. FOOTER (BRANDED) --- */}
+        <footer className="bg-gray-900 text-white pt-16 pb-8 border-t-4 border-[#FFCC01]">
+          <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div className="col-span-1 md:col-span-2">
+              <div className="mb-6">
+                <img
+                  src="/vrl-logo.png"
+                  alt="VRL Logistics Packers and Movers"
+                  className="h-42 w-auto object-contain brightness-0 invert" // 'brightness-0 invert' makes a black logo white for dark footers
+                />
+              </div>
+              <p className="text-gray-400 max-w-sm leading-relaxed mb-6">
+                VRL Logistics Packers and Movers is a well-established logistics company in India, known for its reliable and efficient services.
+                The company's loading services are a key part of its comprehensive logistics solutions.
+              </p>
+              {/* <div className="flex gap-4">
                 <span className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#FFCC01] hover:text-black transition cursor-pointer"><Phone size={18}/></span>
                 <span className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#FFCC01] hover:text-black transition cursor-pointer"><Mail size={18}/></span>
                 <span className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#FFCC01] hover:text-black transition cursor-pointer"><MapPin size={18}/></span>
               </div> */}
-          </div>
+            </div>
 
-          <div>
-            <h3 className="font-bold text-lg mb-4 text-[#FFCC01]">Quick Links</h3>
-            <ul className="space-y-3 text-gray-400">
-              <li>
-                <a
-                  href="#"
-                  //onClick={handleHomeClick} // <--- NEW LINK
-                  className="hover:text-white transition hover:underline"
-                >
-                  Home
-                </a>
-              </li>
-              <li><a href="https://vrllogistics.co.in/gallery" className="hover:text-white transition hover:underline">Gallery</a></li>
-              <li><a href="#contact-section" className="hover:text-white transition hover:underline">Contact</a></li>
-            </ul>
-          </div>
+            <div>
+              <h3 className="font-bold text-lg mb-4 text-[#FFCC01]">Quick Links</h3>
+              <ul className="space-y-3 text-gray-400">
+                <li>
+                  <a
+                    href="#"
+                    //onClick={handleHomeClick} // <--- NEW LINK
+                    className="hover:text-white transition hover:underline"
+                  >
+                    Home
+                  </a>
+                </li>
+                <li><a href="https://vrllogistics.co.in/gallery" className="hover:text-white transition hover:underline">Gallery</a></li>
+                <li><a href="#contact-section" className="hover:text-white transition hover:underline">Contact</a></li>
+              </ul>
+            </div>
 
-          <div>
-            <h3 className="font-bold text-lg mb-4 text-[#FFCC01]">Services</h3>
-            <ul className="space-y-3 text-gray-400">
-              <li><a href="https://vrllogistics.co.in/home-relocation.php" className="hover:text-white transition hover:underline">Home Relocation</a></li>
-              <li><a href="https://vrllogistics.co.in/car-transportation.php" className="hover:text-white transition hover:underline">Car Transportation</a></li>
-              <li><a href="https://vrllogistics.co.in/bike-transportation.php" className="hover:text-white transition hover:underline">Bike Transportation</a></li>
-            </ul>
+            <div>
+              <h3 className="font-bold text-lg mb-4 text-[#FFCC01]">Services</h3>
+              <ul className="space-y-3 text-gray-400">
+                <li><a href="https://vrllogistics.co.in/home-relocation.php" className="hover:text-white transition hover:underline">Home Relocation</a></li>
+                <li><a href="https://vrllogistics.co.in/car-transportation.php" className="hover:text-white transition hover:underline">Car Transportation</a></li>
+                <li><a href="https://vrllogistics.co.in/bike-transportation.php" className="hover:text-white transition hover:underline">Bike Transportation</a></li>
+              </ul>
+            </div>
           </div>
-        </div>
-        <div className="max-w-7xl mx-auto px-4 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-          © 2025 VRL Logistics Packers and Movers. All rights reserved.
-        </div>
-      </footer>
+          <div className="max-w-7xl mx-auto px-4 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
+            © 2025 VRL Logistics Packers and Movers. All rights reserved.
+          </div>
+        </footer>
 
-      {/* Review Modal */}
-      <ReviewForm
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        userId={user?.uid}
-      />
-    </div>
-  );
-}
+        {/* Review Modal */}
+        <ReviewForm
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          userId={user?.uid}
+        />
+      </div>
+    );
+  }
