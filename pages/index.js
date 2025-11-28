@@ -337,11 +337,24 @@ export default function Home() {
     try {
       await signInWithPopup(auth, facebookProvider);
     } catch (err) {
-      console.error("Facebook Login Error:", err);
-      alert("Failed to login with Facebook. Please try again.");
+      console.error("Facebook Login Error Full Object:", err);
+      
+      let errorMessage = "Failed to login with Facebook.";
+      
+      // Specific Error Handling
+      if (err.code === 'auth/account-exists-with-different-credential') {
+        errorMessage = "An account already exists with the same email address but different sign-in credentials. Please sign in using the method you used previously (e.g., Google).";
+      } else if (err.code === 'auth/popup-closed-by-user') {
+        errorMessage = "Login popup was closed before completion.";
+      } else if (err.code === 'auth/operation-not-allowed') {
+        errorMessage = "Facebook login is not enabled in the Firebase Console.";
+      } else if (err.message) {
+        errorMessage = `Facebook Login Failed: ${err.message}`;
+      }
+
+      alert(errorMessage);
     }
   };
-
   const handleGuestLogin = async () => {
     try {
       await signInAnonymously(auth);
@@ -350,7 +363,6 @@ export default function Home() {
       console.error("Guest Login Error:", err);
     }
   };
-
   const handleLogout = async () => {
     if (confirm("Are you sure you want to logout?")) {
       await signOut(auth);
@@ -358,7 +370,6 @@ export default function Home() {
 
     }
   };
-
   // Data Fetching
   useEffect(() => {
     if (!db) {
@@ -366,7 +377,6 @@ export default function Home() {
       setLoading(false);
       return;
     }
-
     try {
       const q = query(collection(db, 'reviews'), orderBy('createdAt', 'desc'));
       const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -389,7 +399,6 @@ export default function Home() {
       setLoading(false);
     }
   }, []);
-
   //Logic for Verified Review Carousel (Every 5 Seconds)
   const verifiedReviews = useMemo(() => reviews.filter(r => r.verified), [reviews]);
 
@@ -400,7 +409,6 @@ export default function Home() {
     }, 5000); // 5000ms = 5 seconds
     return () => clearInterval(interval);
   }, [verifiedReviews.length]);
-
   // Filter & Sort
   const processedReviews = useMemo(() => {
     let result = [...reviews];
@@ -409,10 +417,8 @@ export default function Home() {
     if (sortBy === 'Lowest') result.sort((a, b) => a.rating - b.rating);
     else if (sortBy === 'Highest') result.sort((a, b) => b.rating - a.rating);
     else result.sort((a, b) => b.createdAt - a.createdAt);
-
     return result;
   }, [reviews, filterCategory, sortBy, showVerifiedOnly]);
-
   // Stats
   const stats = useMemo(() => {
     const total = reviews.length;
