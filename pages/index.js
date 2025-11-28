@@ -325,7 +325,7 @@ export default function Home() {
 
     // Listen for auth state changes
     const unsubscribe = onAuthStateChanged(auth, (u) => {
-      setAuthLoading(false);
+      setIsAuthLoading(false);
       if (u) {
         // User is logged in
         setUser(u);
