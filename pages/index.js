@@ -298,6 +298,7 @@ export default function Home() {
   const [currentVerifiedIndex, setCurrentVerifiedIndex] = useState(0);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
   const handleCloseWarning = useCallback(() => {
     setIsWarningOpen(false);
   }, []);
@@ -311,20 +312,15 @@ export default function Home() {
         if (result) {
           // User successfully logged in via Redirect
           //console.log("Redirect Login Success:", result.user);
-          console.log("Redirect Login Success");
+          console.log("Redirect Login Success:", result.user);
           // Modal will close automatically via the onAuthStateChanged listener below
         }
       })
       .catch((error) => {
         console.error("Redirect Login Error:", error);
-        // Explicitly handle Account Exists Error
-        if (error.code === 'auth/account-exists-with-different-credential') {
-          alert("Login Failed: An account with this email already exists using a different provider (e.g., Google). Please login with that provider instead.");
-        } else if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/user-cancelled') {
-          alert(`Login Failed: ${error.message}`);
+        if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/user-cancelled') {
+           alert(`Login Failed: ${error.message}`);
         }
-        // Force auth loading to stop if error occurs
-        setAuthLoading(false);
       });
 
     // Listen for auth state changes
@@ -363,15 +359,9 @@ export default function Home() {
     }
   };
   // --- Facebook Login Handler ---
-  const handleFacebookLogin = async () => {
-    try {
-      console.log("Attempting Facebook Redirect...");
-      await signInWithRedirect(auth, facebookProvider);
-    } catch (err) {
-      console.error("Facebook Login Error:", err);
-      // Show the EXACT error from Firebase so we know what's wrong
-      alert(`Facebook Login Failed:\n\nError Code: ${err.code}\nMessage: ${err.message}`);
-    }
+ const handleFacebookLogin = async () => {
+    try { await signInWithRedirect(auth, facebookProvider); } 
+    catch (err) { console.error(err); alert("Facebook Login Failed"); }
   };
   //     let errorMessage = "Failed to login with Facebook.";
       
@@ -474,18 +464,25 @@ export default function Home() {
   //     </div>
   //   );
   // }
+  if (isAuthChecking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#FFCC01] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-500 font-medium">Verifying Login...</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800 font-sans">
       <LoginModal
-        isOpen={showLoginModal}
+        isOpen={showLoginModal && !user}
         onGoogleLogin={handleGoogleLogin}
         onFacebookLogin={handleFacebookLogin}
         onGuestLogin={handleGuestLogin}
       />
-      <ProfileModal isOpen={isProfileOpen}
-        onClose={() => setIsProfileOpen(false)} user={user}
-        onLogout={handleLogout}
-      />
+      <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} user={user} onLogout={handleLogout} />
       <WarningModal isOpen={isWarningOpen} onClose={handleCloseWarning} />
       <ScrollToTop />
 
