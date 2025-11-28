@@ -365,11 +365,12 @@ export default function Home() {
   // --- Facebook Login Handler ---
   const handleFacebookLogin = async () => {
     try {
-      // Use Redirect for Facebook (Best for Mobile/Instagram Browser compatibility)
+      console.log("Attempting Facebook Redirect...");
       await signInWithRedirect(auth, facebookProvider);
     } catch (err) {
-      console.error(/*"Facebook Login Error:",*/ err);
-      alert("Failed to initiate Facebook login.");
+      console.error("Facebook Login Error:", err);
+      // Show the EXACT error from Firebase so we know what's wrong
+      alert(`Facebook Login Failed:\n\nError Code: ${err.code}\nMessage: ${err.message}`);
     }
   };
   //     let errorMessage = "Failed to login with Facebook.";
@@ -463,16 +464,16 @@ export default function Home() {
     return { total, verifiedTotal, avg, distribution };
   }, [reviews]);
   // --- GLOBAL LOADING STATE ---
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 size={48} className="text-[#FFCC01] animate-spin" />
-          <p className="text-gray-500 font-medium">Loading VRL Reviews...</p>
-        </div>
-      </div>
-    );
-  }
+  // if (authLoading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center bg-gray-50">
+  //       <div className="flex flex-col items-center gap-4">
+  //         <Loader2 size={48} className="text-[#FFCC01] animate-spin" />
+  //         <p className="text-gray-500 font-medium">Loading VRL Reviews...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800 font-sans">
       <LoginModal
