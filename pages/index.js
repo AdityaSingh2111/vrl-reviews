@@ -359,7 +359,7 @@ export default function Home() {
   };
   // --- Facebook Login Handler ---
   const handleFacebookLogin = async () => {
-    try { await signInWithPopup(auth, facebookProvider); }
+    try { await signInWithRedirect(auth, facebookProvider); }
     catch (err) { console.error(err); alert("Facebook Login Failed"); }
   };
   const handleGuestLogin = async () => {
