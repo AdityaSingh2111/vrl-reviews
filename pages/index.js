@@ -2,7 +2,8 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { db, auth, googleProvider, facebookProvider } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc } from 'firebase/firestore';
-import { signInAnonymously, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
+import { signInAnonymously, onAuthStateChanged, signInWithPopup, signInWithRedirect, 
+  getRedirectResult, signOut } from 'firebase/auth';
 import ReviewForm from '../components/ReviewForm';
 import StarRating from '../components/StarRating';
 import {
@@ -303,6 +304,22 @@ export default function Home() {
   useEffect(() => {
     if (!auth) return;
 
+    // 1. Check if user just returned from Facebook Redirect
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result) {
+          // User successfully logged in via Redirect
+          console.log("Redirect Login Success:", result.user);
+          // Modal will close automatically via the onAuthStateChanged listener below
+        }
+      })
+      .catch((error) => {
+        console.error("Redirect Login Error:", error);
+        if (error.code !== 'auth/popup-closed-by-user') {
+           alert(`Login Failed: ${error.message}`);
+        }
+      });
+
     // Listen for auth state changes
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       if (u) {
@@ -329,7 +346,11 @@ export default function Home() {
       // Modal closes automatically via useEffect when auth state changes
     } catch (err) {
       console.error("Google Login Error:", err);
-      alert("Failed to login with Google. Please try again.");
+      if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/popup-blocked') {
+         await signInWithRedirect(auth, googleProvider);
+      } else {
+         alert("Failed to login with Google. Please try again.");
+      }
     }
   };
   // --- Facebook Login Handler ---
@@ -337,24 +358,26 @@ export default function Home() {
     try {
       await signInWithPopup(auth, facebookProvider);
     } catch (err) {
-      console.error("Facebook Login Error Full Object:", err);
-      
-      let errorMessage = "Failed to login with Facebook.";
-      
-      // Specific Error Handling
-      if (err.code === 'auth/account-exists-with-different-credential') {
-        errorMessage = "An account already exists with the same email address but different sign-in credentials. Please sign in using the method you used previously (e.g., Google).";
-      } else if (err.code === 'auth/popup-closed-by-user') {
-        errorMessage = "Login popup was closed before completion.";
-      } else if (err.code === 'auth/operation-not-allowed') {
-        errorMessage = "Facebook login is not enabled in the Firebase Console.";
-      } else if (err.message) {
-        errorMessage = `Facebook Login Failed: ${err.message}`;
-      }
-
-      alert(errorMessage);
+      console.error("Facebook Login Error:", err);
+      alert("Failed to initiate Facebook login.");
     }
   };
+  //     let errorMessage = "Failed to login with Facebook.";
+      
+  //     // Specific Error Handling
+  //     if (err.code === 'auth/account-exists-with-different-credential') {
+  //       errorMessage = "An account already exists with the same email address but different sign-in credentials. Please sign in using the method you used previously (e.g., Google).";
+  //     } else if (err.code === 'auth/popup-closed-by-user') {
+  //       errorMessage = "Login popup was closed before completion.";
+  //     } else if (err.code === 'auth/operation-not-allowed') {
+  //       errorMessage = "Facebook login is not enabled in the Firebase Console.";
+  //     } else if (err.message) {
+  //       errorMessage = `Facebook Login Failed: ${err.message}`;
+  //     }
+
+  //     alert(errorMessage);
+  //   }
+  // };
   const handleGuestLogin = async () => {
     try {
       await signInAnonymously(auth);
