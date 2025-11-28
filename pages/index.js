@@ -2,8 +2,10 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { db, auth, googleProvider, facebookProvider } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot, doc, updateDoc } from 'firebase/firestore';
-import { signInAnonymously, onAuthStateChanged, signInWithPopup, signInWithRedirect, 
-  getRedirectResult, signOut } from 'firebase/auth';
+import {
+  signInAnonymously, onAuthStateChanged, signInWithPopup, signInWithRedirect,
+  getRedirectResult, signOut
+} from 'firebase/auth';
 import ReviewForm from '../components/ReviewForm';
 import StarRating from '../components/StarRating';
 import {
@@ -289,7 +291,6 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isWarningOpen, setIsWarningOpen] = useState(false); // true to false
   const [loading, setLoading] = useState(true);
-  //const [authLoading, setAuthLoading] = useState(true);
   const [error, setError] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
   const [sortBy, setSortBy] = useState('Newest');
@@ -319,15 +320,14 @@ export default function Home() {
       .catch((error) => {
         console.error("Redirect Login Error:", error);
         if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/user-cancelled') {
-           alert(`Login Failed: ${error.message}`);
+          alert(`Login Failed: ${error.message}`);
         }
       });
 
     // Listen for auth state changes
     const unsubscribe = onAuthStateChanged(auth, (u) => {
-      // --- FIXED: Update the correct loading state ---
       setIsAuthChecking(false);
-      
+
       if (u) {
         setUser(u);
         setShowLoginModal(false);
@@ -351,33 +351,17 @@ export default function Home() {
       console.error("Google Login Error:", err);
       // Fallback to redirect if popup fails (optional but recommended)
       if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/popup-blocked') {
-         await signInWithRedirect(auth, googleProvider);
+        await signInWithRedirect(auth, googleProvider);
       } else {
-         alert("Failed to login with Google.");
+        alert("Failed to login with Google.");
       }
     }
   };
   // --- Facebook Login Handler ---
- const handleFacebookLogin = async () => {
-    try { await signInWithRedirect(auth, facebookProvider); } 
+  const handleFacebookLogin = async () => {
+    try { await signInWithPopup(auth, facebookProvider); }
     catch (err) { console.error(err); alert("Facebook Login Failed"); }
   };
-  //     let errorMessage = "Failed to login with Facebook.";
-      
-  //     // Specific Error Handling
-  //     if (err.code === 'auth/account-exists-with-different-credential') {
-  //       errorMessage = "An account already exists with the same email address but different sign-in credentials. Please sign in using the method you used previously (e.g., Google).";
-  //     } else if (err.code === 'auth/popup-closed-by-user') {
-  //       errorMessage = "Login popup was closed before completion.";
-  //     } else if (err.code === 'auth/operation-not-allowed') {
-  //       errorMessage = "Facebook login is not enabled in the Firebase Console.";
-  //     } else if (err.message) {
-  //       errorMessage = `Facebook Login Failed: ${err.message}`;
-  //     }
-
-  //     alert(errorMessage);
-  //   }
-  // };
   const handleGuestLogin = async () => {
     try {
       await signInAnonymously(auth);
@@ -923,7 +907,7 @@ export default function Home() {
             </ul>
           </div>
         </div>
-        
+
         <div className="max-w-7xl mx-auto px-4 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
           © 2025 VRL Logistics Packers and Movers. All rights reserved.
         </div>
