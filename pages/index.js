@@ -287,8 +287,9 @@ export default function Home() {
   const [reviews, setReviews] = useState([]);
   const [user, setUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isWarningOpen, setIsWarningOpen] = useState(true);
+  const [isWarningOpen, setIsWarningOpen] = useState(false); // true to false
   const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
   const [error, setError] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
   const [sortBy, setSortBy] = useState('Newest');
@@ -309,19 +310,26 @@ export default function Home() {
       .then((result) => {
         if (result) {
           // User successfully logged in via Redirect
-          console.log("Redirect Login Success:", result.user);
+          //console.log("Redirect Login Success:", result.user);
+          console.log("Redirect Login Success");
           // Modal will close automatically via the onAuthStateChanged listener below
         }
       })
       .catch((error) => {
         console.error("Redirect Login Error:", error);
-        if (error.code !== 'auth/popup-closed-by-user') {
-           alert(`Login Failed: ${error.message}`);
+        // Explicitly handle Account Exists Error
+        if (error.code === 'auth/account-exists-with-different-credential') {
+          alert("Login Failed: An account with this email already exists using a different provider (e.g., Google). Please login with that provider instead.");
+        } else if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/user-cancelled') {
+          alert(`Login Failed: ${error.message}`);
         }
+        // Force auth loading to stop if error occurs
+        setAuthLoading(false);
       });
 
     // Listen for auth state changes
     const unsubscribe = onAuthStateChanged(auth, (u) => {
+      setAuthLoading(false);
       if (u) {
         // User is logged in
         setUser(u);
@@ -360,7 +368,7 @@ export default function Home() {
       // Use Redirect for Facebook (Best for Mobile/Instagram Browser compatibility)
       await signInWithRedirect(auth, facebookProvider);
     } catch (err) {
-      console.error("Facebook Login Error:", err);
+      console.error(/*"Facebook Login Error:",*/ err);
       alert("Failed to initiate Facebook login.");
     }
   };
@@ -454,7 +462,17 @@ export default function Home() {
     reviews.forEach(r => { if (distribution[r.rating] !== undefined) distribution[r.rating]++; });
     return { total, verifiedTotal, avg, distribution };
   }, [reviews]);
-  //const handleAdminReply = async (reviewId) => {
+  // --- GLOBAL LOADING STATE ---
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 size={48} className="text-[#FFCC01] animate-spin" />
+          <p className="text-gray-500 font-medium">Loading VRL Reviews...</p>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800 font-sans">
       <LoginModal
