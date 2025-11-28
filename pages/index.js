@@ -289,7 +289,7 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isWarningOpen, setIsWarningOpen] = useState(false); // true to false
   const [loading, setLoading] = useState(true);
-  const [authLoading, setAuthLoading] = useState(true);
+  //const [authLoading, setAuthLoading] = useState(true);
   const [error, setError] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
   const [sortBy, setSortBy] = useState('Newest');
@@ -325,15 +325,14 @@ export default function Home() {
 
     // Listen for auth state changes
     const unsubscribe = onAuthStateChanged(auth, (u) => {
-      setIsAuthLoading(false);
+      // --- FIXED: Update the correct loading state ---
+      setIsAuthChecking(false);
+      
       if (u) {
-        // User is logged in
         setUser(u);
         setShowLoginModal(false);
-        // Only show warning if logged in
         setIsWarningOpen(true);
       } else {
-        // User is logged out -> Show Login Modal
         setUser(null);
         setShowLoginModal(true);
         setIsWarningOpen(false);
