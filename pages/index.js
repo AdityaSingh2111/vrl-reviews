@@ -821,35 +821,32 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- 5. FOOTER (BRANDED) --- */}
+      {/* --- FOOTER --- */}
       <footer className="bg-gray-900 text-white pt-16 pb-8 border-t-4 border-[#FFCC01]">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+          {/* Company Info */}
           <div className="col-span-1 md:col-span-2">
             <div className="mb-6">
               <img
                 src="/vrl-logo.png"
                 alt="VRL Logistics Packers and Movers"
-                className="h-42 w-auto object-contain brightness-0 invert" // 'brightness-0 invert' makes a black logo white for dark footers
+                className="h-42 w-auto object-contain brightness-0 invert"
               />
             </div>
             <p className="text-gray-400 max-w-sm leading-relaxed mb-6">
               VRL Logistics Packers and Movers is a well-established logistics company in India, known for its reliable and efficient services.
               The company's loading services are a key part of its comprehensive logistics solutions.
             </p>
-            {/* <div className="flex gap-4">
-                <span className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#FFCC01] hover:text-black transition cursor-pointer"><Phone size={18}/></span>
-                <span className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#FFCC01] hover:text-black transition cursor-pointer"><Mail size={18}/></span>
-                <span className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-[#FFCC01] hover:text-black transition cursor-pointer"><MapPin size={18}/></span>
-              </div> */}
           </div>
 
+          {/* Quick Links */}
           <div>
             <h3 className="font-bold text-lg mb-4 text-[#FFCC01]">Quick Links</h3>
             <ul className="space-y-3 text-gray-400">
               <li>
                 <a
                   href="#"
-                  //onClick={handleHomeClick} // <--- NEW LINK
+                  onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   className="hover:text-white transition hover:underline"
                 >
                   Home
@@ -857,18 +854,30 @@ export default function Home() {
               </li>
               <li><a href="https://vrllogistics.co.in/gallery" className="hover:text-white transition hover:underline">Gallery</a></li>
               <li><a href="#contact-section" className="hover:text-white transition hover:underline">Contact</a></li>
+              <li>
+                <Link href="/privacy-policy" className="hover:text-white transition hover:underline">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="hover:text-white transition hover:underline">
+                  Terms of Service
+                </Link>
+              </li>
             </ul>
           </div>
 
+          {/* Services */}
           <div>
             <h3 className="font-bold text-lg mb-4 text-[#FFCC01]">Services</h3>
             <ul className="space-y-3 text-gray-400">
-              <li><a href="https://vrllogistics.co.in/home-relocation.php" className="hover:text-white transition hover:underline">Home Relocation</a></li>
-              <li><a href="https://vrllogistics.co.in/car-transportation.php" className="hover:text-white transition hover:underline">Car Transportation</a></li>
-              <li><a href="https://vrllogistics.co.in/bike-transportation.php" className="hover:text-white transition hover:underline">Bike Transportation</a></li>
+              <li><a href="https://vrllogistics.co.in/home-relocation" className="hover:text-white transition hover:underline">Home Relocation</a></li>
+              <li><a href="https://vrllogistics.co.in/car-transportatin" className="hover:text-white transition hover:underline">Car Transportation</a></li>
+              <li><a href="https://vrllogistics.co.in/bike-transportation" className="hover:text-white transition hover:underline">Bike Transportation</a></li>
             </ul>
           </div>
         </div>
+        
         <div className="max-w-7xl mx-auto px-4 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
           © 2025 VRL Logistics Packers and Movers. All rights reserved.
         </div>
