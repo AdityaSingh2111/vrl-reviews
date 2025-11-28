@@ -342,21 +342,23 @@ export default function Home() {
   // --- Login Handlers ---
   const handleGoogleLogin = async () => {
     try {
+      // Google usually works fine with Popup on all devices
       await signInWithPopup(auth, googleProvider);
-      // Modal closes automatically via useEffect when auth state changes
     } catch (err) {
       console.error("Google Login Error:", err);
+      // Fallback to redirect if popup fails (optional but recommended)
       if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/popup-blocked') {
          await signInWithRedirect(auth, googleProvider);
       } else {
-         alert("Failed to login with Google. Please try again.");
+         alert("Failed to login with Google.");
       }
     }
   };
   // --- Facebook Login Handler ---
   const handleFacebookLogin = async () => {
     try {
-      await signInWithPopup(auth, facebookProvider);
+      // Use Redirect for Facebook (Best for Mobile/Instagram Browser compatibility)
+      await signInWithRedirect(auth, facebookProvider);
     } catch (err) {
       console.error("Facebook Login Error:", err);
       alert("Failed to initiate Facebook login.");
