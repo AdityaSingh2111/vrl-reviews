@@ -436,17 +436,6 @@ export default function Home() {
     reviews.forEach(r => { if (distribution[r.rating] !== undefined) distribution[r.rating]++; });
     return { total, verifiedTotal, avg, distribution };
   }, [reviews]);
-  // --- GLOBAL LOADING STATE ---
-  // if (authLoading) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-  //       <div className="flex flex-col items-center gap-4">
-  //         <Loader2 size={48} className="text-[#FFCC01] animate-spin" />
-  //         <p className="text-gray-500 font-medium">Loading VRL Reviews...</p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
   if (isAuthChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -488,8 +477,6 @@ export default function Home() {
               >
                 Write a Review
               </button>
-
-
               {user ? (
                 <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
                   <button
@@ -516,7 +503,6 @@ export default function Home() {
                   <LogIn size={20} /> Login
                 </button>
               )}
-              {/* -------------------------------------- */}
             </div>
 
             <div className="flex items-center md:hidden">
