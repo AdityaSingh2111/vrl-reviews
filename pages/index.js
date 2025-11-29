@@ -289,7 +289,7 @@ export default function Home() {
   const [reviews, setReviews] = useState([]);
   const [user, setUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isWarningOpen, setIsWarningOpen] = useState(false); // true to false
+  const [isWarningOpen, setIsWarningOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
