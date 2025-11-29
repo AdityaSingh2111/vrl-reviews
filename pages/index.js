@@ -303,44 +303,106 @@ export default function Home() {
   const handleCloseWarning = useCallback(() => {
     setIsWarningOpen(false);
   }, []);
+  // // --- AUTH ---
+  // useEffect(() => {
+  //   if (!auth) return;
+
+  //   // 1. Check if user just returned from Facebook Redirect
+  //   getRedirectResult(auth)
+  //     .then((result) => {
+  //       if (result) {
+  //         // User successfully logged in via Redirect
+  //         //console.log("Redirect Login Success:", result.user);
+  //         console.log("Redirect Login Success:", result.user);
+  //         // Modal will close automatically via the onAuthStateChanged listener below
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("Redirect Login Error:", error);
+  //       if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/user-cancelled') {
+  //         alert(`Login Failed: ${error.message}`);
+  //       }
+  //     });
+
+  //   // Listen for auth state changes
+  //   const unsubscribe = onAuthStateChanged(auth, (u) => {
+  //     setIsAuthChecking(false);
+
+  //     if (u) {
+  //       setUser(u);
+  //       setShowLoginModal(false);
+  //       setIsWarningOpen(true);
+  //     } else {
+  //       setUser(null);
+  //       setShowLoginModal(true);
+  //       setIsWarningOpen(false);
+  //     }
+  //   });
+
+  //   return () => unsubscribe();
+  // }, []);
+
   // --- AUTH ---
   useEffect(() => {
     if (!auth) return;
 
-    // 1. Check if user just returned from Facebook Redirect
+    let unsubscribe;
+    let redirectCheckComplete = false;
+    let authListenerFired = false;
+
+    // Helper to determine when to stop the spinner
+    const checkLoadingState = () => {
+      if (redirectCheckComplete && authListenerFired) {
+        setIsAuthChecking(false);
+      }
+    };
+
+    // 1. Check for Redirect Result (Facebook) - Run immediately
     getRedirectResult(auth)
       .then((result) => {
         if (result) {
-          // User successfully logged in via Redirect
-          //console.log("Redirect Login Success:", result.user);
           console.log("Redirect Login Success:", result.user);
-          // Modal will close automatically via the onAuthStateChanged listener below
         }
       })
       .catch((error) => {
         console.error("Redirect Login Error:", error);
+        // Only show alert for real errors, not "user cancelled" or "popup closed" which can happen naturally
         if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/user-cancelled') {
-          alert(`Login Failed: ${error.message}`);
+           alert(`Login Failed: ${error.message}`);
         }
+      })
+      .finally(() => {
+        redirectCheckComplete = true;
+        checkLoadingState();
       });
 
-    // Listen for auth state changes
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
-      setIsAuthChecking(false);
-
+    // 2. Listen for Auth State Changes - Run immediately (don't wait for redirect)
+    unsubscribe = onAuthStateChanged(auth, (u) => {
       if (u) {
         setUser(u);
         setShowLoginModal(false);
         setIsWarningOpen(true);
       } else {
         setUser(null);
-        setShowLoginModal(true);
-        setIsWarningOpen(false);
+        // Don't open modal yet; wait until we are sure loading is done
       }
+      
+      authListenerFired = true;
+      checkLoadingState();
     });
 
-    return () => unsubscribe();
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
+
+  // Effect to manage Login Modal visibility based on final loading state
+  useEffect(() => {
+    if (!isAuthChecking && !user) {
+      setShowLoginModal(true);
+      setIsWarningOpen(false);
+    }
+  }, [isAuthChecking, user]);
 
   // --- Login Handlers ---
   const handleGoogleLogin = async () => {
